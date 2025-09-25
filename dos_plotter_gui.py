@@ -509,7 +509,7 @@ class DOSPlotterGUI:
         """Open file dialog"""
         file_path = filedialog.askopenfilename(
             title="Select DOS File",
-            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+            filetypes=[("DOS files (no extension)", "*."), ("All files", "*.*"), ("Text files", "*.txt")]
         )
         if file_path:
             self.load_file(file_path)
@@ -1222,7 +1222,7 @@ License: MIT Open Source"""
         """Add files to multi-file plotting list"""
         file_paths = filedialog.askopenfilenames(
             title="Select DOS Files for Multi-File Plotting",
-            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+            filetypes=[("DOS files (no extension)", "*."), ("All files", "*.*"), ("Text files", "*.txt")]
         )
         
         for file_path in file_paths:
