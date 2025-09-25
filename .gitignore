@@ -1,0 +1,195 @@
+# VASP DOS Plotter - Git Ignore File
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Generated plots and data files
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.svg
+*.eps
+*.gif
+*.bmp
+*.tiff
+
+# Generated data files
+*.csv
+*.txt
+!requirements.txt
+!README.txt
+!LICENSE.txt
+*.dat
+*.out
+*.log
+
+# VASP specific files (keep only essential DOS files)
+vasprun.xml
+OUTCAR
+CHG*
+WAVECAR
+EIGENVAL
+IBZKPT
+KPOINTS
+POSCAR
+POTCAR
+INCAR
+*.vasp
+*.cif
+
+# Keep only essential DOS files
+!RES/DOS*
+!DOS*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Windows
+*.lnk
+*.url
+
+# Logs
+*.log
+logs/
+
+# Configuration files (keep essential ones)
+config.ini
+settings.json
+!requirements.txt
+
+# Test files
+test_*
+*_test.py
+tests/
+
+# Documentation build
+docs/_build/
+site/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Profiling
+.prof
+
+# Local development
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package files
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Backup files
+*.orig
+*.rej
+
+# Lock files
+Pipfile.lock
+poetry.lock
+yarn.lock
+package-lock.json
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Scientific computing cache
+.numpy_cache/
+.scipy_cache/
+.matplotlib_cache/
+
+# Keep essential project files
+!README.md
+!LICENSE
+!CHANGELOG.md
+!CONTRIBUTING.md
+!setup.py
+!pyproject.toml
+!MANIFEST.in
