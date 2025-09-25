@@ -283,7 +283,7 @@ class DOSPlotterGUI:
         ttk.Button(bulk_buttons_frame, text="Clear Plot", 
                   command=self.clear_multi_plot).pack(side='left', padx=(0, 3))
         ttk.Button(bulk_buttons_frame, text="Save Multi-Plot", 
-                  command=self.save_multi_plot).pack(side='left')
+                  command=self.save_plot).pack(side='left')
         
         # Progress indicator
         self.bulk_progress_var = tk.StringVar(value="Ready for multi-file plotting")
@@ -1632,71 +1632,6 @@ License: MIT Open Source"""
         self.bulk_progress_var.set("Plot cleared")
         self.status_var.set("Ready")
         
-    def save_multi_plot(self):
-        """Save the current multi-file plot"""
-        if not hasattr(self, 'ax') or not self.ax.lines:
-            messagebox.showwarning("Warning", "No multi-file plot to save")
-            return
-            
-        file_path = filedialog.asksaveasfilename(
-            title="Save Multi-File Plot",
-            defaultextension=".png",
-            filetypes=[("PNG files", "*.png"), ("PDF files", "*.pdf"), ("SVG files", "*.svg")]
-        )
-        
-        if file_path:
-            try:
-                # Create new figure with export settings
-                fig = Figure(figsize=(self.figure_width_var.get(), self.figure_height_var.get()), 
-                            dpi=self.dpi_var.get())
-                ax = fig.add_subplot(111)
-                
-                # Recreate the multi-file plot
-                energy_min = float(self.energy_min_var.get())
-                energy_max = float(self.energy_max_var.get())
-                
-                # Get all data from current plot
-                file_data = []
-                for line in self.ax.lines:
-                    if line.get_label() != 'Fermi Level':
-                        # We need to get the original data, but we'll work with what we have
-                        x_data, y_data = line.get_data()
-                        label = line.get_label()
-                        color = line.get_color()
-                        file_data.append((x_data, y_data, label, color))
-                
-                # Plot each file
-                for x_data, y_data, label, color in file_data:
-                    ax.plot(x_data, y_data, color=color, linewidth=self.line_width_var.get(), label=label)
-                
-                # Add Fermi level if present
-                for line in self.ax.lines:
-                    if line.get_label() == 'Fermi Level':
-                        ax.axvline(x=0, color=line.get_color(), linestyle='--', alpha=0.7, linewidth=2, label='Fermi Level')
-                        break
-                
-                # Customize plot
-                ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
-                ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-                ax.set_title('Multi-File DOS Comparison', fontsize=self.title_font_size_var.get(), fontweight='bold')
-                
-                if self.show_grid_var.get():
-                    ax.grid(True, alpha=self.grid_alpha_var.get())
-                
-                ax.legend()
-                ax.set_xlim(energy_min, energy_max)
-                
-                # Copy y-axis limits
-                ax.set_ylim(self.ax.get_ylim())
-                
-                fig.tight_layout()
-                fig.savefig(file_path, dpi=self.dpi_var.get(), bbox_inches='tight')
-                
-                messagebox.showinfo("Success", f"Multi-file plot saved to {file_path}")
-                self.status_var.set(f"Multi-file plot saved to {os.path.basename(file_path)}")
-                
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to save multi-file plot: {str(e)}")
 
 def main():
     """Main function"""
