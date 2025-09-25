@@ -469,11 +469,15 @@ class DOSPlotterGUI:
         ttk.Scale(export_frame, from_=100, to=600, variable=self.dpi_var, 
                  orient='horizontal', length=150).pack(fill='x', pady=(0, 5))
         
-        # Export buttons - compact
-        ttk.Button(export_frame, text="Save PNG", 
-                  command=self.save_plot).pack(fill='x', pady=(0, 3))
-        ttk.Button(export_frame, text="Export CSV", 
-                  command=self.export_data).pack(fill='x', pady=(0, 3))
+        # Export buttons - compact and context-aware
+        self.save_button = ttk.Button(export_frame, text="Save PNG", 
+                                     command=self.save_plot)
+        self.save_button.pack(fill='x', pady=(0, 3))
+        
+        self.export_button = ttk.Button(export_frame, text="Export CSV", 
+                                       command=self.export_data)
+        self.export_button.pack(fill='x', pady=(0, 3))
+        
         ttk.Button(export_frame, text="Copy", 
                   command=self.copy_plot).pack(fill='x')
         
@@ -559,6 +563,7 @@ class DOSPlotterGUI:
             
             # Set plotting mode to single file
             self.plotting_mode = "single"
+            self.update_export_buttons()
             self.multi_file_data = []
             
             # Update UI
@@ -953,13 +958,21 @@ class DOSPlotterGUI:
         self.update_plot()
         
     def save_plot(self):
-        """Save plot to file"""
-        if self.energies is None:
-            messagebox.showwarning("Warning", "No data to plot")
+        """Save plot to file - context aware for single or multi-file mode"""
+        if self.plotting_mode == "single":
+            if self.energies is None:
+                messagebox.showwarning("Warning", "No single file data to plot")
+                return
+        elif self.plotting_mode == "multi":
+            if not self.multi_file_data:
+                messagebox.showwarning("Warning", "No multi-file data to plot")
+                return
+        else:
+            messagebox.showwarning("Warning", "No data loaded")
             return
             
         file_path = filedialog.asksaveasfilename(
-            title="Save Plot",
+            title=f"Save {'Multi-File' if self.plotting_mode == 'multi' else 'Single-File'} Plot",
             defaultextension=".png",
             filetypes=[("PNG files", "*.png"), ("PDF files", "*.pdf"), ("SVG files", "*.svg")]
         )
@@ -971,26 +984,51 @@ class DOSPlotterGUI:
                            dpi=self.dpi_var.get())
                 ax = fig.add_subplot(111)
                 
-                # Recreate plot
-                energy_min = self.energy_min_var.get()
-                energy_max = self.energy_max_var.get()
-                mask = (self.energies >= energy_min) & (self.energies <= energy_max)
-                filtered_energies = self.energies[mask]
-                filtered_dos = self.dos_values[mask]
+                # Get current energy range
+                energy_min = float(self.energy_min_var.get())
+                energy_max = float(self.energy_max_var.get())
                 
-                ax.plot(filtered_energies, filtered_dos, 
-                       color=self.line_color_var.get(),
-                       linewidth=self.line_width_var.get(),
-                       label='Total DOS')
+                if self.plotting_mode == "single":
+                    # Single file plot
+                    mask = (self.energies >= energy_min) & (self.energies <= energy_max)
+                    filtered_energies = self.energies[mask]
+                    filtered_dos = self.dos_values[mask]
+                    
+                    ax.plot(filtered_energies, filtered_dos, 
+                           color=self.line_color_var.get(),
+                           linewidth=self.line_width_var.get(),
+                           label='Total DOS')
+                    
+                    plot_title = 'VASP Density of States'
+                    
+                else:  # multi-file mode
+                    # Multi-file plot
+                    colors = self.generate_colors(len(self.multi_file_data))
+                    
+                    for i, (energies, dos_values, file_path) in enumerate(self.multi_file_data):
+                        mask = (energies >= energy_min) & (energies <= energy_max)
+                        filtered_energies = energies[mask]
+                        filtered_dos = dos_values[mask]
+                        
+                        if len(filtered_energies) > 0:
+                            legend_label = self.format_legend_label(file_path)
+                            ax.plot(filtered_energies, filtered_dos, 
+                                   color=colors[i],
+                                   linewidth=self.line_width_var.get(),
+                                   label=legend_label)
+                    
+                    plot_title = 'Multi-File DOS Comparison'
                 
+                # Add Fermi level if enabled
                 if self.show_fermi_var.get():
                     ax.axvline(x=0, color=self.fermi_color_var.get(), 
                               linestyle='--', alpha=0.7, linewidth=2, 
                               label='Fermi Level')
                 
+                # Customize plot
                 ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
                 ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-                ax.set_title('VASP Density of States', fontsize=self.title_font_size_var.get(), fontweight='bold')
+                ax.set_title(plot_title, fontsize=self.title_font_size_var.get(), fontweight='bold')
                 
                 if self.show_grid_var.get():
                     ax.grid(True, alpha=self.grid_alpha_var.get())
@@ -1001,39 +1039,89 @@ class DOSPlotterGUI:
                 fig.tight_layout()
                 fig.savefig(file_path, dpi=self.dpi_var.get(), bbox_inches='tight')
                 
-                messagebox.showinfo("Success", f"Plot saved to {file_path}")
-                self.status_var.set(f"Plot saved to {os.path.basename(file_path)}")
+                mode_text = "multi-file" if self.plotting_mode == "multi" else "single-file"
+                messagebox.showinfo("Success", f"{mode_text.title()} plot saved to {file_path}")
+                self.status_var.set(f"{mode_text.title()} plot saved to {os.path.basename(file_path)}")
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to save plot: {str(e)}")
                 
     def export_data(self):
-        """Export filtered data to CSV"""
-        if self.energies is None:
-            messagebox.showwarning("Warning", "No data to export")
+        """Export filtered data to CSV - context aware for single or multi-file mode"""
+        if self.plotting_mode == "single":
+            if self.energies is None:
+                messagebox.showwarning("Warning", "No single file data to export")
+                return
+        elif self.plotting_mode == "multi":
+            if not self.multi_file_data:
+                messagebox.showwarning("Warning", "No multi-file data to export")
+                return
+        else:
+            messagebox.showwarning("Warning", "No data loaded")
             return
             
         file_path = filedialog.asksaveasfilename(
-            title="Export Data",
+            title=f"Export {'Multi-File' if self.plotting_mode == 'multi' else 'Single-File'} Data",
             defaultextension=".csv",
             filetypes=[("CSV files", "*.csv"), ("Text files", "*.txt")]
         )
         
         if file_path:
             try:
-                energy_min = self.energy_min_var.get()
-                energy_max = self.energy_max_var.get()
-                mask = (self.energies >= energy_min) & (self.energies <= energy_max)
-                filtered_energies = self.energies[mask]
-                filtered_dos = self.dos_values[mask]
+                energy_min = float(self.energy_min_var.get())
+                energy_max = float(self.energy_max_var.get())
                 
                 with open(file_path, 'w') as f:
-                    f.write("Energy(eV),DOS(states/eV)\n")
-                    for energy, dos in zip(filtered_energies, filtered_dos):
-                        f.write(f"{energy:.6f},{dos:.6f}\n")
+                    if self.plotting_mode == "single":
+                        # Single file export
+                        mask = (self.energies >= energy_min) & (self.energies <= energy_max)
+                        filtered_energies = self.energies[mask]
+                        filtered_dos = self.dos_values[mask]
+                        
+                        f.write("Energy(eV),DOS(states/eV)\n")
+                        for energy, dos in zip(filtered_energies, filtered_dos):
+                            f.write(f"{energy:.6f},{dos:.6f}\n")
+                            
+                    else:  # multi-file mode
+                        # Multi-file export - create columns for each file
+                        # First, collect all unique energy points
+                        all_energies = set()
+                        for energies, dos_values, file_path in self.multi_file_data:
+                            mask = (energies >= energy_min) & (energies <= energy_max)
+                            filtered_energies = energies[mask]
+                            all_energies.update(filtered_energies)
+                        
+                        all_energies = sorted(list(all_energies))
+                        
+                        # Write header with file names
+                        f.write("Energy(eV)")
+                        for _, _, file_path in self.multi_file_data:
+                            filename = os.path.basename(file_path)
+                            f.write(f",{filename}")
+                        f.write("\n")
+                        
+                        # Write data rows
+                        for energy in all_energies:
+                            f.write(f"{energy:.6f}")
+                            for energies, dos_values, file_path in self.multi_file_data:
+                                mask = (energies >= energy_min) & (energies <= energy_max)
+                                filtered_energies = energies[mask]
+                                filtered_dos = dos_values[mask]
+                                
+                                # Find closest energy point
+                                if len(filtered_energies) > 0:
+                                    closest_idx = np.argmin(np.abs(filtered_energies - energy))
+                                    if abs(filtered_energies[closest_idx] - energy) < 0.001:  # Within 1 meV
+                                        f.write(f",{filtered_dos[closest_idx]:.6f}")
+                                    else:
+                                        f.write(",NaN")
+                                else:
+                                    f.write(",NaN")
+                            f.write("\n")
                 
-                messagebox.showinfo("Success", f"Data exported to {file_path}")
-                self.status_var.set(f"Data exported to {os.path.basename(file_path)}")
+                mode_text = "multi-file" if self.plotting_mode == "multi" else "single-file"
+                messagebox.showinfo("Success", f"{mode_text.title()} data exported to {file_path}")
+                self.status_var.set(f"{mode_text.title()} data exported to {os.path.basename(file_path)}")
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to export data: {str(e)}")
@@ -1041,6 +1129,16 @@ class DOSPlotterGUI:
     def copy_plot(self):
         """Copy plot to clipboard"""
         messagebox.showinfo("Info", "Plot copied to clipboard functionality would be implemented here")
+        
+    def update_export_buttons(self):
+        """Update export button labels based on current plotting mode"""
+        if hasattr(self, 'save_button') and hasattr(self, 'export_button'):
+            if self.plotting_mode == "multi":
+                self.save_button.config(text="Save Multi-Plot")
+                self.export_button.config(text="Export Multi-Data")
+            else:
+                self.save_button.config(text="Save PNG")
+                self.export_button.config(text="Export CSV")
         
     def reset_settings(self):
         """Reset all settings to defaults"""
@@ -1390,6 +1488,7 @@ License: MIT Open Source"""
             
             # Set plotting mode to multi-file and store data
             self.plotting_mode = "multi"
+            self.update_export_buttons()
             self.multi_file_data = file_data
             
             # Get current settings
@@ -1527,6 +1626,7 @@ License: MIT Open Source"""
         
         # Reset plotting mode
         self.plotting_mode = "single"
+        self.update_export_buttons()
         self.multi_file_data = []
         
         self.bulk_progress_var.set("Plot cleared")
