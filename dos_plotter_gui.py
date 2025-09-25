@@ -172,14 +172,29 @@ class DOSPlotterGUI:
         self.bottom_frame.pack(fill='both', expand=True, padx=10, pady=5)
         
     def create_file_frame(self):
-        """Create file selection frame"""
+        """Create file selection frame with tabs"""
         file_frame = ttk.LabelFrame(self.top_frame, text="File Operations", padding=5)
         file_frame.pack(side='left', fill='x', expand=True, padx=(0, 5))
         
+        # Create notebook for file operations
+        file_notebook = ttk.Notebook(file_frame)
+        file_notebook.pack(fill='both', expand=True)
+        
+        # Single file tab
+        self.create_single_file_tab(file_notebook)
+        
+        # Bulk operations tab
+        self.create_bulk_operations_tab(file_notebook)
+        
+    def create_single_file_tab(self, notebook):
+        """Create single file operations tab"""
+        single_frame = ttk.Frame(notebook)
+        notebook.add(single_frame, text="Single File")
+        
         # File selection
-        ttk.Label(file_frame, text="DOS File:").pack(anchor='w')
-        file_select_frame = ttk.Frame(file_frame)
-        file_select_frame.pack(fill='x', pady=(0, 10))
+        ttk.Label(single_frame, text="DOS File:").pack(anchor='w')
+        file_select_frame = ttk.Frame(single_frame)
+        file_select_frame.pack(fill='x', pady=(0, 5))
         
         self.file_var = tk.StringVar(value="No file selected")
         self.file_label = ttk.Label(file_select_frame, textvariable=self.file_var, 
@@ -190,19 +205,76 @@ class DOSPlotterGUI:
                   command=self.open_file).pack(side='right')
         
         # Quick load buttons
-        quick_frame = ttk.Frame(file_frame)
-        quick_frame.pack(fill='x')
+        quick_frame = ttk.Frame(single_frame)
+        quick_frame.pack(fill='x', pady=(0, 5))
         
         ttk.Button(quick_frame, text="Load RES/DOS0", 
-                  command=lambda: self.load_file("RES/DOS0")).pack(side='left', padx=(0, 5))
+                  command=lambda: self.load_file("RES/DOS0")).pack(side='left', padx=(0, 3))
         ttk.Button(quick_frame, text="Load Sample", 
-                  command=self.load_sample_data).pack(side='left', padx=(0, 5))
+                  command=self.load_sample_data).pack(side='left', padx=(0, 3))
         ttk.Button(quick_frame, text="About", 
                   command=self.show_about).pack(side='left')
         
         # File info
-        self.file_info = scrolledtext.ScrolledText(file_frame, height=4, width=40)
-        self.file_info.pack(fill='x', pady=(10, 0))
+        self.file_info = scrolledtext.ScrolledText(single_frame, height=3, width=40)
+        self.file_info.pack(fill='x', pady=(5, 0))
+        
+    def create_bulk_operations_tab(self, notebook):
+        """Create bulk operations tab"""
+        bulk_frame = ttk.Frame(notebook)
+        notebook.add(bulk_frame, text="Bulk Operations")
+        
+        # File selection for bulk operations
+        ttk.Label(bulk_frame, text="Select Multiple Files:").pack(anchor='w')
+        
+        # File list with scrollbar
+        list_frame = ttk.Frame(bulk_frame)
+        list_frame.pack(fill='x', pady=(0, 5))
+        
+        self.bulk_files_listbox = tk.Listbox(list_frame, height=4, selectmode=tk.MULTIPLE)
+        scrollbar = ttk.Scrollbar(list_frame, orient='vertical', command=self.bulk_files_listbox.yview)
+        self.bulk_files_listbox.configure(yscrollcommand=scrollbar.set)
+        
+        self.bulk_files_listbox.pack(side='left', fill='both', expand=True)
+        scrollbar.pack(side='right', fill='y')
+        
+        # File selection buttons
+        file_buttons_frame = ttk.Frame(bulk_frame)
+        file_buttons_frame.pack(fill='x', pady=(0, 5))
+        
+        ttk.Button(file_buttons_frame, text="Add Files", 
+                  command=self.add_bulk_files).pack(side='left', padx=(0, 3))
+        ttk.Button(file_buttons_frame, text="Clear List", 
+                  command=self.clear_bulk_files).pack(side='left', padx=(0, 3))
+        ttk.Button(file_buttons_frame, text="Remove Selected", 
+                  command=self.remove_selected_bulk_files).pack(side='left')
+        
+        # Output directory selection
+        ttk.Label(bulk_frame, text="Output Directory:").pack(anchor='w', pady=(5, 0))
+        output_frame = ttk.Frame(bulk_frame)
+        output_frame.pack(fill='x', pady=(0, 5))
+        
+        self.output_dir_var = tk.StringVar(value="Select output directory...")
+        self.output_dir_label = ttk.Label(output_frame, textvariable=self.output_dir_var, 
+                                         background='white', relief='sunken', anchor='w')
+        self.output_dir_label.pack(side='left', fill='x', expand=True, padx=(0, 5))
+        
+        ttk.Button(output_frame, text="Browse", 
+                  command=self.select_output_directory).pack(side='right')
+        
+        # Bulk operation buttons
+        bulk_buttons_frame = ttk.Frame(bulk_frame)
+        bulk_buttons_frame.pack(fill='x', pady=(5, 0))
+        
+        ttk.Button(bulk_buttons_frame, text="Process All", 
+                  command=self.process_bulk_files).pack(side='left', padx=(0, 3))
+        ttk.Button(bulk_buttons_frame, text="Preview First", 
+                  command=self.preview_bulk_file).pack(side='left')
+        
+        # Progress indicator
+        self.bulk_progress_var = tk.StringVar(value="Ready for bulk operations")
+        ttk.Label(bulk_frame, textvariable=self.bulk_progress_var, 
+                 font=('Arial', 8), foreground='blue').pack(anchor='w', pady=(5, 0))
         
     def create_settings_frame(self):
         """Create settings frame"""
@@ -993,6 +1065,182 @@ License: MIT Open Source"""
    • Real-time updates as you change settings"""
         
         messagebox.showinfo("User Guide", help_text)
+        
+    # Bulk operations methods
+    def add_bulk_files(self):
+        """Add files to bulk operations list"""
+        file_paths = filedialog.askopenfilenames(
+            title="Select DOS Files for Bulk Processing",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+        
+        for file_path in file_paths:
+            if file_path not in self.bulk_files_listbox.get(0, tk.END):
+                self.bulk_files_listbox.insert(tk.END, file_path)
+        
+        self.bulk_progress_var.set(f"Added {len(file_paths)} files. Total: {self.bulk_files_listbox.size()}")
+        
+    def clear_bulk_files(self):
+        """Clear all files from bulk operations list"""
+        self.bulk_files_listbox.delete(0, tk.END)
+        self.bulk_progress_var.set("File list cleared")
+        
+    def remove_selected_bulk_files(self):
+        """Remove selected files from bulk operations list"""
+        selected_indices = self.bulk_files_listbox.curselection()
+        for index in reversed(selected_indices):
+            self.bulk_files_listbox.delete(index)
+        
+        remaining = self.bulk_files_listbox.size()
+        self.bulk_progress_var.set(f"Removed {len(selected_indices)} files. Remaining: {remaining}")
+        
+    def select_output_directory(self):
+        """Select output directory for bulk operations"""
+        directory = filedialog.askdirectory(title="Select Output Directory for Bulk Processing")
+        if directory:
+            self.output_dir_var.set(directory)
+            self.bulk_progress_var.set(f"Output directory: {os.path.basename(directory)}")
+            
+    def preview_bulk_file(self):
+        """Preview the first file in bulk operations list"""
+        if self.bulk_files_listbox.size() == 0:
+            messagebox.showwarning("Warning", "No files in bulk operations list")
+            return
+            
+        first_file = self.bulk_files_listbox.get(0)
+        if os.path.exists(first_file):
+            self.load_file(first_file)
+            self.bulk_progress_var.set(f"Previewing: {os.path.basename(first_file)}")
+        else:
+            messagebox.showerror("Error", f"File not found: {first_file}")
+            
+    def process_bulk_files(self):
+        """Process all files in bulk operations list"""
+        if self.bulk_files_listbox.size() == 0:
+            messagebox.showwarning("Warning", "No files in bulk operations list")
+            return
+            
+        if not self.output_dir_var.get() or self.output_dir_var.get() == "Select output directory...":
+            messagebox.showwarning("Warning", "Please select an output directory")
+            return
+            
+        output_dir = self.output_dir_var.get()
+        if not os.path.exists(output_dir):
+            messagebox.showerror("Error", "Output directory does not exist")
+            return
+            
+        # Start bulk processing in a separate thread
+        self.bulk_progress_var.set("Starting bulk processing...")
+        
+        def bulk_process_thread():
+            try:
+                total_files = self.bulk_files_listbox.size()
+                successful = 0
+                failed = 0
+                
+                for i in range(total_files):
+                    file_path = self.bulk_files_listbox.get(i)
+                    
+                    # Update progress in main thread
+                    self.root.after(0, lambda f=file_path, idx=i+1, tot=total_files: 
+                                  self.bulk_progress_var.set(f"Processing {idx}/{tot}: {os.path.basename(f)}"))
+                    
+                    try:
+                        # Read the DOS file
+                        energies, dos_values = self.read_dos_file(file_path)
+                        
+                        if len(energies) == 0:
+                            failed += 1
+                            continue
+                            
+                        # Create plot with current settings
+                        success = self.create_bulk_plot(energies, dos_values, file_path, output_dir)
+                        
+                        if success:
+                            successful += 1
+                        else:
+                            failed += 1
+                            
+                    except Exception as e:
+                        failed += 1
+                        print(f"Error processing {file_path}: {str(e)}")
+                
+                # Update final progress in main thread
+                self.root.after(0, lambda: self.bulk_progress_var.set(
+                    f"Bulk processing complete: {successful} successful, {failed} failed"))
+                
+                # Show completion message
+                self.root.after(0, lambda: messagebox.showinfo("Bulk Processing Complete", 
+                    f"Processed {total_files} files:\n{successful} successful\n{failed} failed\n\nOutput saved to: {output_dir}"))
+                
+            except Exception as e:
+                self.root.after(0, lambda: self.bulk_progress_var.set(f"Bulk processing error: {str(e)}"))
+                self.root.after(0, lambda: messagebox.showerror("Error", f"Bulk processing failed: {str(e)}"))
+        
+        threading.Thread(target=bulk_process_thread, daemon=True).start()
+        
+    def create_bulk_plot(self, energies, dos_values, file_path, output_dir):
+        """Create a plot for bulk processing with current settings"""
+        try:
+            # Get current settings
+            energy_min = float(self.energy_min_var.get())
+            energy_max = float(self.energy_max_var.get())
+            
+            # Filter data
+            mask = (energies >= energy_min) & (energies <= energy_max)
+            filtered_energies = energies[mask]
+            filtered_dos = dos_values[mask]
+            
+            if len(filtered_energies) == 0:
+                return False
+                
+            # Create figure with export settings
+            fig = Figure(figsize=(self.figure_width_var.get(), self.figure_height_var.get()), 
+                        dpi=self.dpi_var.get())
+            ax = fig.add_subplot(111)
+            
+            # Plot data
+            ax.plot(filtered_energies, filtered_dos, 
+                   color=self.line_color_var.get(),
+                   linewidth=self.line_width_var.get(),
+                   label='Total DOS')
+            
+            # Add Fermi level if enabled
+            if self.show_fermi_var.get():
+                ax.axvline(x=0, color=self.fermi_color_var.get(), 
+                          linestyle='--', alpha=0.7, linewidth=2, 
+                          label='Fermi Level')
+            
+            # Customize plot
+            ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
+            ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
+            
+            # Use filename as title
+            filename = os.path.splitext(os.path.basename(file_path))[0]
+            ax.set_title(f'DOS: {filename}', fontsize=self.title_font_size_var.get(), fontweight='bold')
+            
+            if self.show_grid_var.get():
+                ax.grid(True, alpha=self.grid_alpha_var.get())
+            
+            ax.legend()
+            ax.set_xlim(energy_min, energy_max)
+            
+            # Auto-scale y-axis
+            y_margin = (filtered_dos.max() - filtered_dos.min()) * 0.05
+            ax.set_ylim(filtered_dos.min() - y_margin, filtered_dos.max() + y_margin)
+            
+            fig.tight_layout()
+            
+            # Save plot
+            output_filename = f"{filename}_DOS.png"
+            output_path = os.path.join(output_dir, output_filename)
+            fig.savefig(output_path, dpi=self.dpi_var.get(), bbox_inches='tight')
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error creating plot for {file_path}: {str(e)}")
+            return False
 
 def main():
     """Main function"""
