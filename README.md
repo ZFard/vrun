@@ -2,6 +2,8 @@
 
 This project demonstrates how to create Density of States (DOS) plots using VASP output files (vasprun.xml) and provides multiple plotting options.
 
+> 📖 **Learn More**: Check out our [About Section](ABOUT.md) to meet our mascot and learn about the project's mission! 🎨
+
 ## Project Structure
 
 ```
@@ -11,9 +13,11 @@ vrun/
 ├── launch_gui.bat       # Windows launcher for GUI
 ├── requirements.txt     # Python package requirements
 ├── README.md           # This documentation
+├── ABOUT.md            # About section with mascot and project details
 ├── GUI_USAGE_GUIDE.md  # Detailed GUI usage guide
 ├── RES/
-│   └── DOS0            # Real VASP DOS data file
+│   ├── DOS0            # Real VASP DOS data file
+│   └── Mascot.jpg      # Project mascot image
 └── venv/               # Python virtual environment
 ```
 
@@ -169,8 +173,10 @@ If Python plotting doesn't work, you can:
 - **launch_gui.bat**: Windows launcher for the GUI application
 - **requirements.txt**: Python package dependencies
 - **README.md**: This documentation file
+- **ABOUT.md**: About section with project mascot and detailed project information
 - **GUI_USAGE_GUIDE.md**: Detailed guide for using the GUI application
 - **RES/DOS0**: Real VASP DOS data file (your actual data)
+- **RES/Mascot.jpg**: Project mascot image
 - **venv/**: Python virtual environment with all dependencies
 
 ## Requirements
