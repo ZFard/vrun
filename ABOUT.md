@@ -4,6 +4,22 @@
 
 The **VASP DOS Plotter** is a comprehensive tool designed for visualizing Density of States (DOS) data from VASP (Vienna Ab initio Simulation Package) calculations. This project provides both an intuitive graphical user interface and command-line tools for researchers working with electronic structure calculations.
 
+## 👨‍🔬 Meet the Author
+
+<div align="center">
+  <img src="RES/Mascot.jpg" alt="Zeinab H. Fard" width="200" height="200" style="border-radius: 50%;">
+  <br>
+  <h3>👋 Hi, I'm <strong>Zeinab H. Fard</strong></h3>
+  <p><em>Ph.D. Researcher in Chemical and Biological Engineering</em><br>
+  <strong>Iowa State University</strong></p>
+</div>
+
+I develop software tools that make **computational chemistry and data-driven research** more accessible, including utilities for **DFT simulations and molecular modeling**, **automation scripts** for HPC workflows and analysis, and **data visualization** tools for scientific insights.
+
+I enjoy building open-source solutions at the intersection of **programming, chemistry, and engineering**.
+
+> 📖 **Learn More**: Read my full story in the [Author Section](AUTHOR.md) to understand the vision behind this project!
+
 ## 🎨 Our Mascot
 
 <div align="center">
