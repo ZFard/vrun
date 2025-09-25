@@ -220,12 +220,12 @@ class DOSPlotterGUI:
         self.file_info.pack(fill='x', pady=(5, 0))
         
     def create_bulk_operations_tab(self, notebook):
-        """Create bulk operations tab"""
+        """Create multi-file plotting tab"""
         bulk_frame = ttk.Frame(notebook)
-        notebook.add(bulk_frame, text="Bulk Operations")
+        notebook.add(bulk_frame, text="Multi-File Plot")
         
-        # File selection for bulk operations
-        ttk.Label(bulk_frame, text="Select Multiple Files:").pack(anchor='w')
+        # File selection for multi-file plotting
+        ttk.Label(bulk_frame, text="Select Files to Plot Together:").pack(anchor='w')
         
         # File list with scrollbar
         list_frame = ttk.Frame(bulk_frame)
@@ -249,30 +249,29 @@ class DOSPlotterGUI:
         ttk.Button(file_buttons_frame, text="Remove Selected", 
                   command=self.remove_selected_bulk_files).pack(side='left')
         
-        # Output directory selection
-        ttk.Label(bulk_frame, text="Output Directory:").pack(anchor='w', pady=(5, 0))
-        output_frame = ttk.Frame(bulk_frame)
-        output_frame.pack(fill='x', pady=(0, 5))
+        # Color settings
+        color_frame = ttk.Frame(bulk_frame)
+        color_frame.pack(fill='x', pady=(5, 5))
         
-        self.output_dir_var = tk.StringVar(value="Select output directory...")
-        self.output_dir_label = ttk.Label(output_frame, textvariable=self.output_dir_var, 
-                                         background='white', relief='sunken', anchor='w')
-        self.output_dir_label.pack(side='left', fill='x', expand=True, padx=(0, 5))
+        ttk.Label(color_frame, text="Color Scheme:").pack(side='left')
+        self.color_scheme_var = tk.StringVar(value="auto")
+        color_combo = ttk.Combobox(color_frame, textvariable=self.color_scheme_var,
+                                  values=['auto', 'rainbow', 'viridis', 'plasma', 'tab10'], width=10)
+        color_combo.pack(side='left', padx=(5, 0))
         
-        ttk.Button(output_frame, text="Browse", 
-                  command=self.select_output_directory).pack(side='right')
-        
-        # Bulk operation buttons
+        # Multi-file operation buttons
         bulk_buttons_frame = ttk.Frame(bulk_frame)
         bulk_buttons_frame.pack(fill='x', pady=(5, 0))
         
-        ttk.Button(bulk_buttons_frame, text="Process All", 
-                  command=self.process_bulk_files).pack(side='left', padx=(0, 3))
-        ttk.Button(bulk_buttons_frame, text="Preview First", 
-                  command=self.preview_bulk_file).pack(side='left')
+        ttk.Button(bulk_buttons_frame, text="Plot All Together", 
+                  command=self.plot_all_files_together).pack(side='left', padx=(0, 3))
+        ttk.Button(bulk_buttons_frame, text="Clear Plot", 
+                  command=self.clear_multi_plot).pack(side='left', padx=(0, 3))
+        ttk.Button(bulk_buttons_frame, text="Save Multi-Plot", 
+                  command=self.save_multi_plot).pack(side='left')
         
         # Progress indicator
-        self.bulk_progress_var = tk.StringVar(value="Ready for bulk operations")
+        self.bulk_progress_var = tk.StringVar(value="Ready for multi-file plotting")
         ttk.Label(bulk_frame, textvariable=self.bulk_progress_var, 
                  font=('Arial', 8), foreground='blue').pack(anchor='w', pady=(5, 0))
         
@@ -1068,9 +1067,9 @@ License: MIT Open Source"""
         
     # Bulk operations methods
     def add_bulk_files(self):
-        """Add files to bulk operations list"""
+        """Add files to multi-file plotting list"""
         file_paths = filedialog.askopenfilenames(
-            title="Select DOS Files for Bulk Processing",
+            title="Select DOS Files for Multi-File Plotting",
             filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
         )
         
@@ -1081,12 +1080,12 @@ License: MIT Open Source"""
         self.bulk_progress_var.set(f"Added {len(file_paths)} files. Total: {self.bulk_files_listbox.size()}")
         
     def clear_bulk_files(self):
-        """Clear all files from bulk operations list"""
+        """Clear all files from multi-file plotting list"""
         self.bulk_files_listbox.delete(0, tk.END)
         self.bulk_progress_var.set("File list cleared")
         
     def remove_selected_bulk_files(self):
-        """Remove selected files from bulk operations list"""
+        """Remove selected files from multi-file plotting list"""
         selected_indices = self.bulk_files_listbox.curselection()
         for index in reversed(selected_indices):
             self.bulk_files_listbox.delete(index)
@@ -1094,153 +1093,212 @@ License: MIT Open Source"""
         remaining = self.bulk_files_listbox.size()
         self.bulk_progress_var.set(f"Removed {len(selected_indices)} files. Remaining: {remaining}")
         
-    def select_output_directory(self):
-        """Select output directory for bulk operations"""
-        directory = filedialog.askdirectory(title="Select Output Directory for Bulk Processing")
-        if directory:
-            self.output_dir_var.set(directory)
-            self.bulk_progress_var.set(f"Output directory: {os.path.basename(directory)}")
-            
-    def preview_bulk_file(self):
-        """Preview the first file in bulk operations list"""
+    def plot_all_files_together(self):
+        """Plot all selected files together in one plot with different colors"""
         if self.bulk_files_listbox.size() == 0:
-            messagebox.showwarning("Warning", "No files in bulk operations list")
+            messagebox.showwarning("Warning", "No files selected for multi-file plotting")
             return
             
-        first_file = self.bulk_files_listbox.get(0)
-        if os.path.exists(first_file):
-            self.load_file(first_file)
-            self.bulk_progress_var.set(f"Previewing: {os.path.basename(first_file)}")
-        else:
-            messagebox.showerror("Error", f"File not found: {first_file}")
-            
-    def process_bulk_files(self):
-        """Process all files in bulk operations list"""
-        if self.bulk_files_listbox.size() == 0:
-            messagebox.showwarning("Warning", "No files in bulk operations list")
-            return
-            
-        if not self.output_dir_var.get() or self.output_dir_var.get() == "Select output directory...":
-            messagebox.showwarning("Warning", "Please select an output directory")
-            return
-            
-        output_dir = self.output_dir_var.get()
-        if not os.path.exists(output_dir):
-            messagebox.showerror("Error", "Output directory does not exist")
-            return
-            
-        # Start bulk processing in a separate thread
-        self.bulk_progress_var.set("Starting bulk processing...")
+        # Start multi-file plotting in a separate thread
+        self.bulk_progress_var.set("Loading files for multi-file plot...")
         
-        def bulk_process_thread():
+        def multi_plot_thread():
             try:
-                total_files = self.bulk_files_listbox.size()
-                successful = 0
-                failed = 0
+                file_paths = [self.bulk_files_listbox.get(i) for i in range(self.bulk_files_listbox.size())]
+                file_data = []
                 
-                for i in range(total_files):
-                    file_path = self.bulk_files_listbox.get(i)
-                    
-                    # Update progress in main thread
-                    self.root.after(0, lambda f=file_path, idx=i+1, tot=total_files: 
-                                  self.bulk_progress_var.set(f"Processing {idx}/{tot}: {os.path.basename(f)}"))
+                # Load all files
+                for i, file_path in enumerate(file_paths):
+                    self.root.after(0, lambda f=file_path, idx=i+1, tot=len(file_paths): 
+                                  self.bulk_progress_var.set(f"Loading {idx}/{tot}: {os.path.basename(f)}"))
                     
                     try:
-                        # Read the DOS file
                         energies, dos_values = self.read_dos_file(file_path)
-                        
-                        if len(energies) == 0:
-                            failed += 1
-                            continue
-                            
-                        # Create plot with current settings
-                        success = self.create_bulk_plot(energies, dos_values, file_path, output_dir)
-                        
-                        if success:
-                            successful += 1
-                        else:
-                            failed += 1
-                            
+                        if len(energies) > 0:
+                            filename = os.path.splitext(os.path.basename(file_path))[0]
+                            file_data.append((energies, dos_values, filename))
                     except Exception as e:
-                        failed += 1
-                        print(f"Error processing {file_path}: {str(e)}")
+                        print(f"Error loading {file_path}: {str(e)}")
                 
-                # Update final progress in main thread
-                self.root.after(0, lambda: self.bulk_progress_var.set(
-                    f"Bulk processing complete: {successful} successful, {failed} failed"))
+                if not file_data:
+                    self.root.after(0, lambda: messagebox.showerror("Error", "No valid files could be loaded"))
+                    return
                 
-                # Show completion message
-                self.root.after(0, lambda: messagebox.showinfo("Bulk Processing Complete", 
-                    f"Processed {total_files} files:\n{successful} successful\n{failed} failed\n\nOutput saved to: {output_dir}"))
+                # Create multi-file plot in main thread
+                self.root.after(0, lambda: self.create_multi_file_plot(file_data))
                 
             except Exception as e:
-                self.root.after(0, lambda: self.bulk_progress_var.set(f"Bulk processing error: {str(e)}"))
-                self.root.after(0, lambda: messagebox.showerror("Error", f"Bulk processing failed: {str(e)}"))
+                self.root.after(0, lambda: self.bulk_progress_var.set(f"Multi-file plotting error: {str(e)}"))
+                self.root.after(0, lambda: messagebox.showerror("Error", f"Multi-file plotting failed: {str(e)}"))
         
-        threading.Thread(target=bulk_process_thread, daemon=True).start()
+        threading.Thread(target=multi_plot_thread, daemon=True).start()
         
-    def create_bulk_plot(self, energies, dos_values, file_path, output_dir):
-        """Create a plot for bulk processing with current settings"""
+    def create_multi_file_plot(self, file_data):
+        """Create a multi-file plot with different colors and legend"""
         try:
+            self.bulk_progress_var.set("Creating multi-file plot...")
+            
             # Get current settings
             energy_min = float(self.energy_min_var.get())
             energy_max = float(self.energy_max_var.get())
             
-            # Filter data
-            mask = (energies >= energy_min) & (energies <= energy_max)
-            filtered_energies = energies[mask]
-            filtered_dos = dos_values[mask]
+            # Clear current plot
+            self.ax.clear()
             
-            if len(filtered_energies) == 0:
-                return False
+            # Generate colors based on scheme
+            colors = self.generate_colors(len(file_data))
+            
+            # Plot each file with different color
+            for i, (energies, dos_values, filename) in enumerate(file_data):
+                # Filter data
+                mask = (energies >= energy_min) & (energies <= energy_max)
+                filtered_energies = energies[mask]
+                filtered_dos = dos_values[mask]
                 
-            # Create figure with export settings
-            fig = Figure(figsize=(self.figure_width_var.get(), self.figure_height_var.get()), 
-                        dpi=self.dpi_var.get())
-            ax = fig.add_subplot(111)
-            
-            # Plot data
-            ax.plot(filtered_energies, filtered_dos, 
-                   color=self.line_color_var.get(),
-                   linewidth=self.line_width_var.get(),
-                   label='Total DOS')
+                if len(filtered_energies) > 0:
+                    # Plot with unique color and filename as label
+                    self.ax.plot(filtered_energies, filtered_dos, 
+                               color=colors[i],
+                               linewidth=self.line_width_var.get(),
+                               label=filename)
             
             # Add Fermi level if enabled
             if self.show_fermi_var.get():
-                ax.axvline(x=0, color=self.fermi_color_var.get(), 
-                          linestyle='--', alpha=0.7, linewidth=2, 
-                          label='Fermi Level')
+                self.ax.axvline(x=0, color=self.fermi_color_var.get(), 
+                               linestyle='--', alpha=0.7, linewidth=2, 
+                               label='Fermi Level')
             
             # Customize plot
-            ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
-            ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-            
-            # Use filename as title
-            filename = os.path.splitext(os.path.basename(file_path))[0]
-            ax.set_title(f'DOS: {filename}', fontsize=self.title_font_size_var.get(), fontweight='bold')
+            self.ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
+            self.ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
+            self.ax.set_title('Multi-File DOS Comparison', fontsize=self.title_font_size_var.get(), fontweight='bold')
             
             if self.show_grid_var.get():
-                ax.grid(True, alpha=self.grid_alpha_var.get())
+                self.ax.grid(True, alpha=self.grid_alpha_var.get())
             
-            ax.legend()
-            ax.set_xlim(energy_min, energy_max)
+            # Add legend
+            self.ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            self.ax.set_xlim(energy_min, energy_max)
             
-            # Auto-scale y-axis
-            y_margin = (filtered_dos.max() - filtered_dos.min()) * 0.05
-            ax.set_ylim(filtered_dos.min() - y_margin, filtered_dos.max() + y_margin)
+            # Auto-scale y-axis based on all data
+            all_dos_values = []
+            for energies, dos_values, _ in file_data:
+                mask = (energies >= energy_min) & (energies <= energy_max)
+                filtered_dos = dos_values[mask]
+                if len(filtered_dos) > 0:
+                    all_dos_values.extend(filtered_dos)
             
-            fig.tight_layout()
+            if all_dos_values:
+                y_margin = (max(all_dos_values) - min(all_dos_values)) * 0.05
+                self.ax.set_ylim(min(all_dos_values) - y_margin, max(all_dos_values) + y_margin)
             
-            # Save plot
-            output_filename = f"{filename}_DOS.png"
-            output_path = os.path.join(output_dir, output_filename)
-            fig.savefig(output_path, dpi=self.dpi_var.get(), bbox_inches='tight')
+            self.canvas.draw()
             
-            return True
+            # Update status
+            self.status_var.set(f"Multi-file plot created with {len(file_data)} files")
+            self.bulk_progress_var.set(f"Multi-file plot complete: {len(file_data)} files plotted")
             
         except Exception as e:
-            print(f"Error creating plot for {file_path}: {str(e)}")
-            return False
+            self.bulk_progress_var.set(f"Error creating multi-file plot: {str(e)}")
+            messagebox.showerror("Error", f"Failed to create multi-file plot: {str(e)}")
+            
+    def generate_colors(self, num_colors):
+        """Generate distinct colors for multiple files"""
+        import matplotlib.cm as cm
+        import matplotlib.colors as mcolors
+        
+        scheme = self.color_scheme_var.get()
+        
+        if scheme == 'auto':
+            # Use matplotlib's default color cycle
+            colors = [f'C{i}' for i in range(num_colors)]
+        elif scheme == 'rainbow':
+            colors = [cm.rainbow(i / max(1, num_colors - 1)) for i in range(num_colors)]
+        elif scheme == 'viridis':
+            colors = [cm.viridis(i / max(1, num_colors - 1)) for i in range(num_colors)]
+        elif scheme == 'plasma':
+            colors = [cm.plasma(i / max(1, num_colors - 1)) for i in range(num_colors)]
+        elif scheme == 'tab10':
+            colors = [cm.tab10(i % 10) for i in range(num_colors)]
+        else:
+            # Fallback to default
+            colors = [f'C{i}' for i in range(num_colors)]
+            
+        return colors
+        
+    def clear_multi_plot(self):
+        """Clear the multi-file plot"""
+        self.ax.clear()
+        self.ax.set_title('VASP Density of States', fontsize=self.title_font_size_var.get(), fontweight='bold')
+        self.canvas.draw()
+        self.bulk_progress_var.set("Plot cleared")
+        self.status_var.set("Ready")
+        
+    def save_multi_plot(self):
+        """Save the current multi-file plot"""
+        if not hasattr(self, 'ax') or not self.ax.lines:
+            messagebox.showwarning("Warning", "No multi-file plot to save")
+            return
+            
+        file_path = filedialog.asksaveasfilename(
+            title="Save Multi-File Plot",
+            defaultextension=".png",
+            filetypes=[("PNG files", "*.png"), ("PDF files", "*.pdf"), ("SVG files", "*.svg")]
+        )
+        
+        if file_path:
+            try:
+                # Create new figure with export settings
+                fig = Figure(figsize=(self.figure_width_var.get(), self.figure_height_var.get()), 
+                            dpi=self.dpi_var.get())
+                ax = fig.add_subplot(111)
+                
+                # Recreate the multi-file plot
+                energy_min = float(self.energy_min_var.get())
+                energy_max = float(self.energy_max_var.get())
+                
+                # Get all data from current plot
+                file_data = []
+                for line in self.ax.lines:
+                    if line.get_label() != 'Fermi Level':
+                        # We need to get the original data, but we'll work with what we have
+                        x_data, y_data = line.get_data()
+                        label = line.get_label()
+                        color = line.get_color()
+                        file_data.append((x_data, y_data, label, color))
+                
+                # Plot each file
+                for x_data, y_data, label, color in file_data:
+                    ax.plot(x_data, y_data, color=color, linewidth=self.line_width_var.get(), label=label)
+                
+                # Add Fermi level if present
+                for line in self.ax.lines:
+                    if line.get_label() == 'Fermi Level':
+                        ax.axvline(x=0, color=line.get_color(), linestyle='--', alpha=0.7, linewidth=2, label='Fermi Level')
+                        break
+                
+                # Customize plot
+                ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
+                ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
+                ax.set_title('Multi-File DOS Comparison', fontsize=self.title_font_size_var.get(), fontweight='bold')
+                
+                if self.show_grid_var.get():
+                    ax.grid(True, alpha=self.grid_alpha_var.get())
+                
+                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+                ax.set_xlim(energy_min, energy_max)
+                
+                # Copy y-axis limits
+                ax.set_ylim(self.ax.get_ylim())
+                
+                fig.tight_layout()
+                fig.savefig(file_path, dpi=self.dpi_var.get(), bbox_inches='tight')
+                
+                messagebox.showinfo("Success", f"Multi-file plot saved to {file_path}")
+                self.status_var.set(f"Multi-file plot saved to {os.path.basename(file_path)}")
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to save multi-file plot: {str(e)}")
 
 def main():
     """Main function"""
