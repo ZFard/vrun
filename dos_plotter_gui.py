@@ -20,7 +20,7 @@ class DOSPlotterGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("VASP DOS Plotter - Professional Edition")
-        self.root.geometry("1200x750")
+        self.root.geometry("1200x680")
         self.root.configure(bg='#f0f0f0')
         
         # Data storage
@@ -173,7 +173,7 @@ class DOSPlotterGUI:
         
     def create_file_frame(self):
         """Create file selection frame"""
-        file_frame = ttk.LabelFrame(self.top_frame, text="File Operations", padding=10)
+        file_frame = ttk.LabelFrame(self.top_frame, text="File Operations", padding=5)
         file_frame.pack(side='left', fill='x', expand=True, padx=(0, 5))
         
         # File selection
@@ -206,7 +206,7 @@ class DOSPlotterGUI:
         
     def create_settings_frame(self):
         """Create settings frame"""
-        settings_frame = ttk.LabelFrame(self.top_frame, text="Plot Settings", padding=10)
+        settings_frame = ttk.LabelFrame(self.top_frame, text="Plot Settings", padding=5)
         settings_frame.pack(side='right', fill='x', expand=True, padx=(5, 0))
         
         # Create notebook for organized settings
@@ -227,77 +227,77 @@ class DOSPlotterGUI:
         energy_frame = ttk.Frame(notebook)
         notebook.add(energy_frame, text="Energy Range")
         
-        # Energy range
-        ttk.Label(energy_frame, text="Energy Range (eV):").pack(anchor='w', pady=(0, 5))
+        # Energy range - compact layout
+        ttk.Label(energy_frame, text="Energy Range (eV):").pack(anchor='w', pady=(0, 3))
         
-        # Text entry fields
+        # Text entry fields - more compact
         range_frame = ttk.Frame(energy_frame)
-        range_frame.pack(fill='x', pady=(0, 5))
+        range_frame.pack(fill='x', pady=(0, 3))
         
         ttk.Label(range_frame, text="Min:").pack(side='left')
         self.energy_min_var = tk.DoubleVar(value=self.settings['energy_min'])
-        self.energy_min_entry = ttk.Entry(range_frame, textvariable=self.energy_min_var, width=10)
-        self.energy_min_entry.pack(side='left', padx=(5, 10))
+        self.energy_min_entry = ttk.Entry(range_frame, textvariable=self.energy_min_var, width=8)
+        self.energy_min_entry.pack(side='left', padx=(3, 8))
         self.energy_min_var.trace('w', lambda *args: self.validate_and_update())
         
         ttk.Label(range_frame, text="Max:").pack(side='left')
         self.energy_max_var = tk.DoubleVar(value=self.settings['energy_max'])
-        self.energy_max_entry = ttk.Entry(range_frame, textvariable=self.energy_max_var, width=10)
-        self.energy_max_entry.pack(side='left', padx=(5, 0))
+        self.energy_max_entry = ttk.Entry(range_frame, textvariable=self.energy_max_var, width=8)
+        self.energy_max_entry.pack(side='left', padx=(3, 0))
         self.energy_max_var.trace('w', lambda *args: self.validate_and_update())
         
-        # Interactive sliders
-        ttk.Label(energy_frame, text="Interactive Sliders:").pack(anchor='w', pady=(5, 0))
+        # Interactive sliders - more compact
+        ttk.Label(energy_frame, text="Sliders:").pack(anchor='w', pady=(3, 0))
         
-        # Min energy slider
+        # Min energy slider - compact
         min_slider_frame = ttk.Frame(energy_frame)
-        min_slider_frame.pack(fill='x', pady=(2, 5))
+        min_slider_frame.pack(fill='x', pady=(1, 2))
         
-        ttk.Label(min_slider_frame, text="Min Energy:", width=12).pack(side='left')
+        ttk.Label(min_slider_frame, text="Min:", width=6).pack(side='left')
         self.energy_min_slider = ttk.Scale(min_slider_frame, from_=-20, to=20, 
                                           variable=self.energy_min_var, orient='horizontal',
                                           command=lambda x: self.slider_update('min'))
-        self.energy_min_slider.pack(side='left', fill='x', expand=True, padx=(5, 5))
+        self.energy_min_slider.pack(side='left', fill='x', expand=True, padx=(3, 3))
         
-        # Max energy slider
+        # Max energy slider - compact
         max_slider_frame = ttk.Frame(energy_frame)
-        max_slider_frame.pack(fill='x', pady=(2, 5))
+        max_slider_frame.pack(fill='x', pady=(1, 2))
         
-        ttk.Label(max_slider_frame, text="Max Energy:", width=12).pack(side='left')
+        ttk.Label(max_slider_frame, text="Max:", width=6).pack(side='left')
         self.energy_max_slider = ttk.Scale(max_slider_frame, from_=-20, to=20, 
                                           variable=self.energy_max_var, orient='horizontal',
                                           command=lambda x: self.slider_update('max'))
-        self.energy_max_slider.pack(side='left', fill='x', expand=True, padx=(5, 5))
+        self.energy_max_slider.pack(side='left', fill='x', expand=True, padx=(3, 3))
         
-        # Slider info
+        # Slider info - smaller
         self.slider_info_var = tk.StringVar(value="Drag sliders to adjust range")
         ttk.Label(energy_frame, textvariable=self.slider_info_var, 
-                 font=('Arial', 8), foreground='gray').pack(anchor='w', pady=(2, 0))
+                 font=('Arial', 7), foreground='gray').pack(anchor='w', pady=(1, 0))
         
-        # Control buttons
+        # Control buttons - more compact
         button_frame = ttk.Frame(energy_frame)
-        button_frame.pack(fill='x', pady=(5, 10))
+        button_frame.pack(fill='x', pady=(3, 5))
         
-        ttk.Button(button_frame, text="Auto-detect Range", 
-                  command=self.auto_detect_range).pack(side='left', padx=(0, 5))
-        ttk.Button(button_frame, text="Zoom to Data", 
-                  command=self.zoom_to_data_range).pack(side='left', padx=(0, 5))
-        ttk.Button(button_frame, text="Reset to -7,7", 
+        ttk.Button(button_frame, text="Auto-detect", 
+                  command=self.auto_detect_range).pack(side='left', padx=(0, 3))
+        ttk.Button(button_frame, text="Zoom Data", 
+                  command=self.zoom_to_data_range).pack(side='left', padx=(0, 3))
+        ttk.Button(button_frame, text="Reset", 
                   command=self.reset_to_default_range).pack(side='left')
         
-        # Fermi level
+        # Fermi level - more compact
         fermi_frame = ttk.Frame(energy_frame)
-        fermi_frame.pack(fill='x', pady=(0, 10))
+        fermi_frame.pack(fill='x', pady=(0, 5))
         
         self.show_fermi_var = tk.BooleanVar(value=self.settings['show_fermi'])
-        ttk.Checkbutton(fermi_frame, text="Show Fermi Level", 
+        ttk.Checkbutton(fermi_frame, text="Fermi Level", 
                        variable=self.show_fermi_var,
                        command=self.schedule_plot_update).pack(side='left')
         
-        ttk.Label(fermi_frame, text="Color:").pack(side='left', padx=(20, 5))
+        ttk.Label(fermi_frame, text="Color:").pack(side='left', padx=(15, 3))
         self.fermi_color_var = tk.StringVar(value=self.settings['fermi_color'])
         fermi_color_combo = ttk.Combobox(fermi_frame, textvariable=self.fermi_color_var,
-                                        values=['red', 'black', 'green', 'blue', 'orange'])
+                                        values=['red', 'black', 'green', 'blue', 'orange'], width=8)
         fermi_color_combo.pack(side='left')
         self.fermi_color_var.trace('w', lambda *args: self.schedule_plot_update())
         
@@ -306,89 +306,89 @@ class DOSPlotterGUI:
         appearance_frame = ttk.Frame(notebook)
         notebook.add(appearance_frame, text="Appearance")
         
-        # Line settings
-        ttk.Label(appearance_frame, text="Line Settings:").pack(anchor='w', pady=(0, 5))
+        # Line settings - compact
+        ttk.Label(appearance_frame, text="Line:").pack(anchor='w', pady=(0, 3))
         
         line_frame = ttk.Frame(appearance_frame)
-        line_frame.pack(fill='x', pady=(0, 10))
+        line_frame.pack(fill='x', pady=(0, 5))
         
         ttk.Label(line_frame, text="Width:").pack(side='left')
         self.line_width_var = tk.DoubleVar(value=self.settings['line_width'])
         ttk.Scale(line_frame, from_=0.5, to=5.0, variable=self.line_width_var, 
-                 orient='horizontal', length=100,
-                 command=lambda x: self.schedule_plot_update()).pack(side='left', padx=(5, 10))
+                 orient='horizontal', length=80,
+                 command=lambda x: self.schedule_plot_update()).pack(side='left', padx=(3, 8))
         
         ttk.Label(line_frame, text="Color:").pack(side='left')
         self.line_color_var = tk.StringVar(value=self.settings['line_color'])
         line_color_combo = ttk.Combobox(line_frame, textvariable=self.line_color_var,
-                                       values=['blue', 'red', 'green', 'black', 'purple', 'orange'])
+                                       values=['blue', 'red', 'green', 'black', 'purple', 'orange'], width=8)
         line_color_combo.pack(side='left')
         self.line_color_var.trace('w', lambda *args: self.schedule_plot_update())
         
-        # Grid settings
+        # Grid settings - compact
         grid_frame = ttk.Frame(appearance_frame)
-        grid_frame.pack(fill='x', pady=(0, 10))
+        grid_frame.pack(fill='x', pady=(0, 5))
         
         self.show_grid_var = tk.BooleanVar(value=self.settings['show_grid'])
-        ttk.Checkbutton(grid_frame, text="Show Grid", 
+        ttk.Checkbutton(grid_frame, text="Grid", 
                        variable=self.show_grid_var,
                        command=self.schedule_plot_update).pack(side='left')
         
-        ttk.Label(grid_frame, text="Alpha:").pack(side='left', padx=(20, 5))
+        ttk.Label(grid_frame, text="Alpha:").pack(side='left', padx=(15, 3))
         self.grid_alpha_var = tk.DoubleVar(value=self.settings['grid_alpha'])
         ttk.Scale(grid_frame, from_=0.1, to=1.0, variable=self.grid_alpha_var, 
-                 orient='horizontal', length=100,
+                 orient='horizontal', length=80,
                  command=lambda x: self.schedule_plot_update()).pack(side='left')
         
-        # Font settings
-        ttk.Label(appearance_frame, text="Font Settings:").pack(anchor='w', pady=(10, 5))
+        # Font settings - compact
+        ttk.Label(appearance_frame, text="Font:").pack(anchor='w', pady=(5, 3))
         
         font_frame = ttk.Frame(appearance_frame)
-        font_frame.pack(fill='x', pady=(0, 10))
+        font_frame.pack(fill='x', pady=(0, 5))
         
         ttk.Label(font_frame, text="Size:").pack(side='left')
         self.font_size_var = tk.IntVar(value=self.settings['font_size'])
         ttk.Scale(font_frame, from_=8, to=20, variable=self.font_size_var, 
-                 orient='horizontal', length=100,
-                 command=lambda x: self.schedule_plot_update()).pack(side='left', padx=(5, 10))
+                 orient='horizontal', length=80,
+                 command=lambda x: self.schedule_plot_update()).pack(side='left', padx=(3, 8))
         
-        ttk.Label(font_frame, text="Title Size:").pack(side='left')
+        ttk.Label(font_frame, text="Title:").pack(side='left')
         self.title_font_size_var = tk.IntVar(value=self.settings['title_font_size'])
         ttk.Scale(font_frame, from_=12, to=24, variable=self.title_font_size_var, 
-                 orient='horizontal', length=100,
-                 command=lambda x: self.schedule_plot_update()).pack(side='left', padx=(5, 0))
+                 orient='horizontal', length=80,
+                 command=lambda x: self.schedule_plot_update()).pack(side='left', padx=(3, 0))
         
     def create_export_tab(self, notebook):
         """Create export settings tab"""
         export_frame = ttk.Frame(notebook)
         notebook.add(export_frame, text="Export")
         
-        # Figure size
-        ttk.Label(export_frame, text="Figure Size:").pack(anchor='w', pady=(0, 5))
+        # Figure size - compact
+        ttk.Label(export_frame, text="Size:").pack(anchor='w', pady=(0, 3))
         
         size_frame = ttk.Frame(export_frame)
-        size_frame.pack(fill='x', pady=(0, 10))
+        size_frame.pack(fill='x', pady=(0, 5))
         
-        ttk.Label(size_frame, text="Width:").pack(side='left')
+        ttk.Label(size_frame, text="W:").pack(side='left')
         self.figure_width_var = tk.DoubleVar(value=self.settings['figure_width'])
-        ttk.Entry(size_frame, textvariable=self.figure_width_var, width=8).pack(side='left', padx=(5, 10))
+        ttk.Entry(size_frame, textvariable=self.figure_width_var, width=6).pack(side='left', padx=(3, 8))
         
-        ttk.Label(size_frame, text="Height:").pack(side='left')
+        ttk.Label(size_frame, text="H:").pack(side='left')
         self.figure_height_var = tk.DoubleVar(value=self.settings['figure_height'])
-        ttk.Entry(size_frame, textvariable=self.figure_height_var, width=8).pack(side='left', padx=(5, 0))
+        ttk.Entry(size_frame, textvariable=self.figure_height_var, width=6).pack(side='left', padx=(3, 0))
         
-        # DPI
-        ttk.Label(export_frame, text="DPI:").pack(anchor='w', pady=(10, 5))
+        # DPI - compact
+        ttk.Label(export_frame, text="DPI:").pack(anchor='w', pady=(5, 3))
         self.dpi_var = tk.IntVar(value=self.settings['dpi'])
         ttk.Scale(export_frame, from_=100, to=600, variable=self.dpi_var, 
-                 orient='horizontal', length=200).pack(fill='x', pady=(0, 10))
+                 orient='horizontal', length=150).pack(fill='x', pady=(0, 5))
         
-        # Export buttons
-        ttk.Button(export_frame, text="Save Plot as PNG", 
-                  command=self.save_plot).pack(fill='x', pady=(0, 5))
-        ttk.Button(export_frame, text="Export Data as CSV", 
-                  command=self.export_data).pack(fill='x', pady=(0, 5))
-        ttk.Button(export_frame, text="Copy to Clipboard", 
+        # Export buttons - compact
+        ttk.Button(export_frame, text="Save PNG", 
+                  command=self.save_plot).pack(fill='x', pady=(0, 3))
+        ttk.Button(export_frame, text="Export CSV", 
+                  command=self.export_data).pack(fill='x', pady=(0, 3))
+        ttk.Button(export_frame, text="Copy", 
                   command=self.copy_plot).pack(fill='x')
         
     def create_plot_frame(self):
