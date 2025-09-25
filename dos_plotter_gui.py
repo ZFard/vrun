@@ -34,6 +34,10 @@ class DOSPlotterGUI:
         self.last_update_time = 0
         self.update_delay = 0.3  # Delay between updates in seconds
         
+        # Plotting mode tracking
+        self.plotting_mode = "single"  # "single" or "multi"
+        self.multi_file_data = []  # Store multi-file data for context-aware updates
+        
         # Default settings
         self.settings = {
             'energy_min': -7.0,
@@ -117,8 +121,9 @@ class DOSPlotterGUI:
             min_val = float(self.energy_min_var.get())
             max_val = float(self.energy_max_var.get())
             
-            # Update slider info
-            self.slider_info_var.set(f"Range: {min_val:.2f} to {max_val:.2f} eV")
+            # Update slider info with mode context
+            mode_text = "Multi-file" if self.plotting_mode == "multi" else "Single file"
+            self.slider_info_var.set(f"{mode_text} Range: {min_val:.2f} to {max_val:.2f} eV")
             
             # Ensure min < max
             if min_val >= max_val:
@@ -542,6 +547,10 @@ class DOSPlotterGUI:
             self.dos_values = dos_values
             self.current_file = file_path
             
+            # Set plotting mode to single file
+            self.plotting_mode = "single"
+            self.multi_file_data = []
+            
             # Update UI
             self.file_var.set(os.path.basename(file_path))
             self.update_file_info()
@@ -617,53 +626,110 @@ class DOSPlotterGUI:
         self.file_info.insert(1.0, info)
         
     def auto_detect_range(self):
-        """Auto-detect reasonable energy range"""
-        if self.energies is None:
-            return
+        """Auto-detect reasonable energy range based on current mode"""
+        if self.plotting_mode == "multi" and self.multi_file_data:
+            # Auto-detect range for multi-file data
+            all_energies = []
+            for energies, _, _ in self.multi_file_data:
+                all_energies.extend(energies)
             
-        # Find range that contains 95% of the data
-        energy_min = np.percentile(self.energies, 2.5)
-        energy_max = np.percentile(self.energies, 97.5)
-        
-        # Update the variables
-        self.energy_min_var.set(energy_min)
-        self.energy_max_var.set(energy_max)
-        
-        # Update slider ranges to accommodate the data
-        data_min = self.energies.min()
-        data_max = self.energies.max()
-        
-        # Set slider ranges with some padding
-        slider_min = min(data_min - 2, energy_min - 1)
-        slider_max = max(data_max + 2, energy_max + 1)
-        
-        self.energy_min_slider.configure(from_=slider_min, to=slider_max)
-        self.energy_max_slider.configure(from_=slider_min, to=slider_max)
-        
-        # Update slider info
-        self.slider_info_var.set(f"Auto-detected: {energy_min:.2f} to {energy_max:.2f} eV")
+            if not all_energies:
+                return
+                
+            all_energies = np.array(all_energies)
+            
+            # Find range that contains 95% of all data
+            energy_min = np.percentile(all_energies, 2.5)
+            energy_max = np.percentile(all_energies, 97.5)
+            
+            # Update the variables
+            self.energy_min_var.set(energy_min)
+            self.energy_max_var.set(energy_max)
+            
+            # Update slider ranges to accommodate all data
+            data_min = all_energies.min()
+            data_max = all_energies.max()
+            
+            # Set slider ranges with some padding
+            slider_min = min(data_min - 2, energy_min - 1)
+            slider_max = max(data_max + 2, energy_max + 1)
+            
+            self.energy_min_slider.configure(from_=slider_min, to=slider_max)
+            self.energy_max_slider.configure(from_=slider_min, to=slider_max)
+            
+            # Update slider info
+            self.slider_info_var.set(f"Multi-file auto-detected: {energy_min:.2f} to {energy_max:.2f} eV")
+            
+        elif self.plotting_mode == "single" and self.energies is not None:
+            # Auto-detect range for single file data
+            # Find range that contains 95% of the data
+            energy_min = np.percentile(self.energies, 2.5)
+            energy_max = np.percentile(self.energies, 97.5)
+            
+            # Update the variables
+            self.energy_min_var.set(energy_min)
+            self.energy_max_var.set(energy_max)
+            
+            # Update slider ranges to accommodate the data
+            data_min = self.energies.min()
+            data_max = self.energies.max()
+            
+            # Set slider ranges with some padding
+            slider_min = min(data_min - 2, energy_min - 1)
+            slider_max = max(data_max + 2, energy_max + 1)
+            
+            self.energy_min_slider.configure(from_=slider_min, to=slider_max)
+            self.energy_max_slider.configure(from_=slider_min, to=slider_max)
+            
+            # Update slider info
+            self.slider_info_var.set(f"Single file auto-detected: {energy_min:.2f} to {energy_max:.2f} eV")
+        else:
+            return
         
         # Update plot
         self.schedule_plot_update()
         
     def zoom_to_data_range(self):
-        """Zoom to show all data with sliders"""
-        if self.energies is None:
-            return
+        """Zoom to show all data with sliders based on current mode"""
+        if self.plotting_mode == "multi" and self.multi_file_data:
+            # Zoom to full range of all multi-file data
+            all_energies = []
+            for energies, _, _ in self.multi_file_data:
+                all_energies.extend(energies)
             
-        # Set to full data range
-        data_min = self.energies.min()
-        data_max = self.energies.max()
-        
-        self.energy_min_var.set(data_min)
-        self.energy_max_var.set(data_max)
-        
-        # Update slider ranges
-        self.energy_min_slider.configure(from_=data_min - 1, to=data_max + 1)
-        self.energy_max_slider.configure(from_=data_min - 1, to=data_max + 1)
-        
-        # Update slider info
-        self.slider_info_var.set(f"Full data range: {data_min:.2f} to {data_max:.2f} eV")
+            if not all_energies:
+                return
+                
+            all_energies = np.array(all_energies)
+            data_min = all_energies.min()
+            data_max = all_energies.max()
+            
+            self.energy_min_var.set(data_min)
+            self.energy_max_var.set(data_max)
+            
+            # Update slider ranges
+            self.energy_min_slider.configure(from_=data_min - 1, to=data_max + 1)
+            self.energy_max_slider.configure(from_=data_min - 1, to=data_max + 1)
+            
+            # Update slider info
+            self.slider_info_var.set(f"Multi-file full range: {data_min:.2f} to {data_max:.2f} eV")
+            
+        elif self.plotting_mode == "single" and self.energies is not None:
+            # Zoom to full range of single file data
+            data_min = self.energies.min()
+            data_max = self.energies.max()
+            
+            self.energy_min_var.set(data_min)
+            self.energy_max_var.set(data_max)
+            
+            # Update slider ranges
+            self.energy_min_slider.configure(from_=data_min - 1, to=data_max + 1)
+            self.energy_max_slider.configure(from_=data_min - 1, to=data_max + 1)
+            
+            # Update slider info
+            self.slider_info_var.set(f"Single file full range: {data_min:.2f} to {data_max:.2f} eV")
+        else:
+            return
         
         # Update plot
         self.schedule_plot_update()
@@ -698,13 +764,19 @@ class DOSPlotterGUI:
             self.is_plotting = False
             
     def update_plot(self):
-        """Update the plot"""
-        if self.energies is None:
+        """Update the plot based on current mode"""
+        if self.plotting_mode == "multi" and self.multi_file_data:
+            self.update_multi_file_plot()
+        elif self.plotting_mode == "single" and self.energies is not None:
+            self.update_single_file_plot()
+        else:
             self.progress_var.set("No data loaded")
             return
             
+    def update_single_file_plot(self):
+        """Update single file plot"""
         try:
-            self.progress_var.set("Updating plot...")
+            self.progress_var.set("Updating single file plot...")
             self.root.update_idletasks()
             
             self.ax.clear()
@@ -764,12 +836,92 @@ class DOSPlotterGUI:
             self.canvas.draw()
             
             # Update status
-            self.status_var.set(f"Plot updated: {len(filtered_energies)} points in range")
+            self.status_var.set(f"Single file plot updated: {len(filtered_energies)} points in range")
             self.progress_var.set("Ready")
             
         except Exception as e:
             self.progress_var.set(f"Error: {str(e)}")
             self.status_var.set(f"Plot error: {str(e)}")
+            raise
+            
+    def update_multi_file_plot(self):
+        """Update multi-file plot"""
+        try:
+            self.progress_var.set("Updating multi-file plot...")
+            self.root.update_idletasks()
+            
+            self.ax.clear()
+            
+            # Get current settings with validation
+            try:
+                energy_min = float(self.energy_min_var.get())
+                energy_max = float(self.energy_max_var.get())
+            except (ValueError, tk.TclError):
+                self.progress_var.set("Invalid energy range")
+                return
+                
+            if energy_min >= energy_max:
+                self.progress_var.set("Min energy must be less than max")
+                return
+            
+            # Generate colors based on scheme
+            colors = self.generate_colors(len(self.multi_file_data))
+            
+            # Plot each file with different color
+            all_dos_values = []
+            for i, (energies, dos_values, filename) in enumerate(self.multi_file_data):
+                # Filter data
+                mask = (energies >= energy_min) & (energies <= energy_max)
+                filtered_energies = energies[mask]
+                filtered_dos = dos_values[mask]
+                
+                if len(filtered_energies) > 0:
+                    # Plot with unique color and filename as label
+                    self.ax.plot(filtered_energies, filtered_dos, 
+                               color=colors[i],
+                               linewidth=self.line_width_var.get(),
+                               label=filename)
+                    all_dos_values.extend(filtered_dos)
+            
+            if not all_dos_values:
+                self.ax.text(0.5, 0.5, 'No data in selected range', 
+                           transform=self.ax.transAxes, ha='center', va='center')
+                self.canvas.draw()
+                self.progress_var.set("No data in range")
+                return
+            
+            # Add Fermi level if enabled
+            if self.show_fermi_var.get():
+                self.ax.axvline(x=0, color=self.fermi_color_var.get(), 
+                               linestyle='--', alpha=0.7, linewidth=2, 
+                               label='Fermi Level')
+            
+            # Customize plot
+            self.ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
+            self.ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
+            self.ax.set_title('Multi-File DOS Comparison', fontsize=self.title_font_size_var.get(), fontweight='bold')
+            
+            if self.show_grid_var.get():
+                self.ax.grid(True, alpha=self.grid_alpha_var.get())
+            
+            # Add legend
+            self.ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            self.ax.set_xlim(energy_min, energy_max)
+            
+            # Auto-scale y-axis based on all data
+            if self.settings.get('auto_scale', True):
+                y_margin = (max(all_dos_values) - min(all_dos_values)) * 0.05
+                self.ax.set_ylim(min(all_dos_values) - y_margin, max(all_dos_values) + y_margin)
+            
+            self.canvas.draw()
+            
+            # Update status
+            self.status_var.set(f"Multi-file plot updated: {len(self.multi_file_data)} files, {len(all_dos_values)} points in range")
+            self.progress_var.set("Ready")
+            
+        except Exception as e:
+            self.progress_var.set(f"Error: {str(e)}")
+            self.status_var.set(f"Multi-file plot error: {str(e)}")
             raise
             
     def reset_view(self):
@@ -1138,6 +1290,10 @@ License: MIT Open Source"""
         try:
             self.bulk_progress_var.set("Creating multi-file plot...")
             
+            # Set plotting mode to multi-file and store data
+            self.plotting_mode = "multi"
+            self.multi_file_data = file_data
+            
             # Get current settings
             energy_min = float(self.energy_min_var.get())
             energy_max = float(self.energy_max_var.get())
@@ -1231,6 +1387,11 @@ License: MIT Open Source"""
         self.ax.clear()
         self.ax.set_title('VASP Density of States', fontsize=self.title_font_size_var.get(), fontweight='bold')
         self.canvas.draw()
+        
+        # Reset plotting mode
+        self.plotting_mode = "single"
+        self.multi_file_data = []
+        
         self.bulk_progress_var.set("Plot cleared")
         self.status_var.set("Ready")
         
