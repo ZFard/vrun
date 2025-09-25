@@ -842,11 +842,11 @@ class DOSPlotterGUI:
             messagebox.showinfo("Info", "Settings saving functionality would be implemented here")
             
     def show_about(self):
-        """Show concise about dialog with author information and mascot"""
+        """Show about dialog with well-aligned layout and author information"""
         # Create a new window for the about dialog
         about_window = tk.Toplevel(self.root)
         about_window.title("About VASP DOS Plotter")
-        about_window.geometry("500x550")
+        about_window.geometry("600x500")
         about_window.configure(bg='#f0f0f0')
         about_window.resizable(False, False)
         
@@ -858,28 +858,35 @@ class DOSPlotterGUI:
         main_frame = tk.Frame(about_window, bg='#f0f0f0')
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # Title
-        title_label = tk.Label(main_frame, text="VASP DOS Plotter", 
-                              font=('Arial', 18, 'bold'), bg='#f0f0f0', fg='#2c3e50')
-        title_label.pack(pady=(0, 5))
+        # Title section
+        title_frame = tk.Frame(main_frame, bg='#f0f0f0')
+        title_frame.pack(fill=tk.X, pady=(0, 20))
         
-        subtitle_label = tk.Label(main_frame, text="Professional Edition v1.0", 
-                                 font=('Arial', 10, 'italic'), bg='#f0f0f0', fg='#7f8c8d')
-        subtitle_label.pack(pady=(0, 15))
+        title_label = tk.Label(title_frame, text="VASP DOS Plotter", 
+                              font=('Arial', 20, 'bold'), bg='#f0f0f0', fg='#2c3e50')
+        title_label.pack()
         
-        # Author section with photo
-        author_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        author_frame.pack(fill=tk.X, pady=(0, 15))
+        subtitle_label = tk.Label(title_frame, text="Professional Edition v1.0", 
+                                 font=('Arial', 11, 'italic'), bg='#f0f0f0', fg='#7f8c8d')
+        subtitle_label.pack(pady=(5, 0))
         
-        # Try to load and display the mascot/author photo with proper aspect ratio
+        # Main content frame with two columns
+        content_frame = tk.Frame(main_frame, bg='#f0f0f0')
+        content_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 20))
+        
+        # Left column - Author photo
+        left_frame = tk.Frame(content_frame, bg='#f0f0f0')
+        left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 20))
+        
+        # Try to load and display the author photo with proper aspect ratio
         try:
             mascot_path = os.path.join("RES", "Mascot.jpg")
             if os.path.exists(mascot_path):
                 # Load the image and maintain aspect ratio
                 image = Image.open(mascot_path)
-                # Calculate new size maintaining aspect ratio (max 100px)
+                # Calculate new size maintaining aspect ratio (max 120px)
                 original_width, original_height = image.size
-                max_size = 100
+                max_size = 120
                 
                 if original_width > original_height:
                     new_width = max_size
@@ -893,72 +900,97 @@ class DOSPlotterGUI:
                 photo = ImageTk.PhotoImage(image)
                 
                 # Display the image
-                image_label = tk.Label(author_frame, image=photo, bg='#f0f0f0')
+                image_label = tk.Label(left_frame, image=photo, bg='#f0f0f0')
                 image_label.image = photo  # Keep a reference
-                image_label.pack(pady=(0, 8))
+                image_label.pack(pady=(10, 0))
             else:
                 # Fallback if image not found
-                image_label = tk.Label(author_frame, text="👨‍🔬", font=('Arial', 50), bg='#f0f0f0')
-                image_label.pack(pady=(0, 8))
+                image_label = tk.Label(left_frame, text="👨‍🔬", font=('Arial', 60), bg='#f0f0f0')
+                image_label.pack(pady=(10, 0))
         except Exception as e:
             # Fallback if PIL not available or image loading fails
-            image_label = tk.Label(author_frame, text="👨‍🔬", font=('Arial', 50), bg='#f0f0f0')
-            image_label.pack(pady=(0, 8))
+            image_label = tk.Label(left_frame, text="👨‍🔬", font=('Arial', 60), bg='#f0f0f0')
+            image_label.pack(pady=(10, 0))
         
-        # Author information (concise)
-        author_name = tk.Label(author_frame, text="👋 Zeinab H. Fard", 
-                              font=('Arial', 13, 'bold'), bg='#f0f0f0', fg='#2c3e50')
-        author_name.pack(pady=(0, 3))
+        # Right column - Author and project information
+        right_frame = tk.Frame(content_frame, bg='#f0f0f0')
+        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         
-        author_title = tk.Label(author_frame, text="Ph.D. Researcher, Chemical & Biological Engineering", 
-                               font=('Arial', 9), bg='#f0f0f0', fg='#34495e')
-        author_title.pack(pady=(0, 2))
+        # Author information section
+        author_section = tk.Frame(right_frame, bg='#f0f0f0')
+        author_section.pack(fill=tk.X, pady=(0, 20))
         
-        author_uni = tk.Label(author_frame, text="Iowa State University", 
-                             font=('Arial', 9, 'bold'), bg='#f0f0f0', fg='#e74c3c')
-        author_uni.pack(pady=(0, 8))
+        author_name = tk.Label(author_section, text="👋 Zeinab H. Fard", 
+                              font=('Arial', 16, 'bold'), bg='#f0f0f0', fg='#2c3e50')
+        author_name.pack(anchor=tk.W, pady=(0, 5))
         
-        # Author description (concise)
-        author_desc = tk.Label(author_frame, 
-                              text="Developing software tools for computational chemistry,\nDFT simulations, and data visualization.",
-                              font=('Arial', 9), bg='#f0f0f0', fg='#2c3e50', justify=tk.CENTER)
-        author_desc.pack(pady=(0, 15))
+        author_title = tk.Label(author_section, text="Ph.D. Researcher", 
+                               font=('Arial', 12, 'bold'), bg='#f0f0f0', fg='#34495e')
+        author_title.pack(anchor=tk.W, pady=(0, 2))
         
-        # Project information (concise)
-        project_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        project_frame.pack(fill=tk.X, pady=(0, 15))
+        author_dept = tk.Label(author_section, text="Chemical & Biological Engineering", 
+                              font=('Arial', 11), bg='#f0f0f0', fg='#34495e')
+        author_dept.pack(anchor=tk.W, pady=(0, 2))
         
-        project_title = tk.Label(project_frame, text="About This Tool", 
-                                font=('Arial', 11, 'bold'), bg='#f0f0f0', fg='#2c3e50')
-        project_title.pack(pady=(0, 8))
+        author_uni = tk.Label(author_section, text="Iowa State University", 
+                             font=('Arial', 11, 'bold'), bg='#f0f0f0', fg='#e74c3c')
+        author_uni.pack(anchor=tk.W, pady=(0, 10))
         
-        project_text = """A comprehensive tool for plotting VASP Density of States data
-with an intuitive graphical interface.
-
-Key Features:
+        # Author description
+        author_desc = tk.Label(author_section, 
+                              text="I develop software tools that make computational chemistry and\ndata-driven research more accessible, including utilities for\nDFT simulations, automation scripts, and data visualization.",
+                              font=('Arial', 10), bg='#f0f0f0', fg='#2c3e50', justify=tk.LEFT, wraplength=350)
+        author_desc.pack(anchor=tk.W, pady=(0, 15))
+        
+        # Project information section
+        project_section = tk.Frame(right_frame, bg='#f0f0f0')
+        project_section.pack(fill=tk.X, pady=(0, 15))
+        
+        project_title = tk.Label(project_section, text="About This Tool", 
+                                font=('Arial', 13, 'bold'), bg='#f0f0f0', fg='#2c3e50')
+        project_title.pack(anchor=tk.W, pady=(0, 8))
+        
+        project_desc = tk.Label(project_section, 
+                               text="A comprehensive tool for plotting and analyzing VASP Density of\nStates data with an intuitive graphical interface.",
+                               font=('Arial', 10), bg='#f0f0f0', fg='#2c3e50', justify=tk.LEFT, wraplength=350)
+        project_desc.pack(anchor=tk.W, pady=(0, 8))
+        
+        # Key features
+        features_text = """Key Features:
 • Real-time plot updates with interactive sliders
 • Multiple export formats (PNG, PDF, SVG)
 • Professional quality output for publications
 • Easy file management and batch processing
-
-License: MIT Open Source"""
+• Threaded operations for responsive UI"""
         
-        project_label = tk.Label(project_frame, text=project_text, 
-                                font=('Arial', 9), bg='#f0f0f0', fg='#2c3e50', justify=tk.LEFT)
-        project_label.pack(pady=(0, 10))
+        features_label = tk.Label(project_section, text=features_text, 
+                                 font=('Arial', 9), bg='#f0f0f0', fg='#2c3e50', justify=tk.LEFT)
+        features_label.pack(anchor=tk.W, pady=(0, 8))
         
-        # Mission statement (concise)
-        mission_text = """Making complex scientific tools accessible through\nopen-source solutions."""
+        # License
+        license_label = tk.Label(project_section, text="License: MIT Open Source", 
+                                font=('Arial', 9, 'bold'), bg='#f0f0f0', fg='#27ae60')
+        license_label.pack(anchor=tk.W, pady=(0, 10))
         
-        mission_label = tk.Label(project_frame, text=mission_text, 
-                                font=('Arial', 9, 'italic'), bg='#f0f0f0', fg='#7f8c8d', justify=tk.CENTER)
-        mission_label.pack(pady=(0, 15))
+        # Mission statement
+        mission_section = tk.Frame(right_frame, bg='#f0f0f0')
+        mission_section.pack(fill=tk.X, pady=(0, 15))
+        
+        mission_text = "Making complex scientific tools accessible through\nopen-source solutions at the intersection of programming,\nchemistry, and engineering."
+        
+        mission_label = tk.Label(mission_section, text=mission_text, 
+                                font=('Arial', 10, 'italic'), bg='#f0f0f0', fg='#7f8c8d', 
+                                justify=tk.LEFT, wraplength=350)
+        mission_label.pack(anchor=tk.W)
         
         # Close button
-        close_button = tk.Button(main_frame, text="Close", command=about_window.destroy,
-                                font=('Arial', 10, 'bold'), bg='#3498db', fg='white',
-                                relief=tk.FLAT, padx=20, pady=5)
-        close_button.pack(pady=(10, 0))
+        button_frame = tk.Frame(main_frame, bg='#f0f0f0')
+        button_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        close_button = tk.Button(button_frame, text="Close", command=about_window.destroy,
+                                font=('Arial', 11, 'bold'), bg='#3498db', fg='white',
+                                relief=tk.FLAT, padx=25, pady=8)
+        close_button.pack()
         
         # Focus on the new window
         about_window.focus_set()
