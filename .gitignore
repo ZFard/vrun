@@ -158,14 +158,10 @@ Thumbs.db
 *.bmp
 *.webp
 
-# Generated plots and outputs
+# Generated plots
 plots/
 output/
 results/
-real_dos_plot.png
-filtered_dos_data.txt
-screenshot*.png
-Screenshot*.png
 
 # Data files
 *.csv
