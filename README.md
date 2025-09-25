@@ -9,19 +9,29 @@ This project demonstrates how to create Density of States (DOS) plots using VASP
 
 ```
 vrun/
-├── dos_plotter_gui.py   # Main GUI application (recommended)
-├── plot_real_dos.py     # Real VASP DOS data plotting script
-├── launch_gui.bat       # Windows launcher for GUI
-├── requirements.txt     # Python package requirements
+├── vasp_dos_plotter/   # Main package directory
+│   ├── __init__.py     # Package initialization
+│   ├── gui.py          # Main GUI application
+│   └── plotter.py      # Command-line plotting functionality
+├── run_gui.py          # Simple GUI launcher
+├── launch_gui.bat      # Windows launcher for GUI
+├── requirements.txt    # Python package requirements
+├── setup.py            # Package setup script
+├── pyproject.toml      # Modern Python packaging configuration
 ├── README.md           # This documentation
 ├── ABOUT.md            # About section with mascot and project details
 ├── AUTHOR.md           # Author information and background
 ├── GUI_USAGE_GUIDE.md  # Detailed GUI usage guide
+├── CONTRIBUTING.md     # Contribution guidelines
+├── CHANGELOG.md        # Version history
+├── CODE_OF_CONDUCT.md  # Code of conduct
+├── SECURITY.md         # Security policy
+├── LICENSE             # MIT License
 ├── logo.png            # Professional logo for the application
 ├── icon.png            # Application icon
 ├── favicon.png         # Favicon for web interfaces
 ├── DrZ.png             # Project mascot and author photo
-├── RES/
+├── RES/                # Sample data directory
 │   └── DOS0            # Real VASP DOS data file
 └── venv/               # Python virtual environment
 ```
@@ -58,7 +68,15 @@ pip install pymatgen matplotlib numpy
 Launch the intuitive graphical interface:
 
 ```bash
-python dos_plotter_gui.py
+# Option 1: Direct launch
+python run_gui.py
+
+# Option 2: Using the batch file (Windows)
+launch_gui.bat
+
+# Option 3: Install as package and use command
+pip install -e .
+vasp-dos-plotter
 ```
 
 Or use the launcher:
@@ -82,7 +100,7 @@ launch_gui.bat
 For automated or batch processing:
 
 ```bash
-python plot_real_dos.py
+python -m vasp_dos_plotter.plotter
 ```
 
 This script:

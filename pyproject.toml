@@ -1,0 +1,131 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vasp-dos-plotter"
+dynamic = ["version"]
+description = "A professional GUI application for plotting VASP Density of States data"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Zeinab H. Fard", email = "zfard@iastate.edu"},
+]
+maintainers = [
+    {name = "Zeinab H. Fard", email = "zfard@iastate.edu"},
+]
+keywords = [
+    "vasp",
+    "density-of-states",
+    "dos",
+    "materials-science",
+    "computational-chemistry",
+    "visualization",
+    "gui",
+    "plotting",
+    "dft",
+    "electronic-structure",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Environment :: X11 Applications :: Qt",
+    "Environment :: Win32 (MS Windows)",
+    "Environment :: MacOS X",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "pymatgen>=2023.12.18",
+    "matplotlib>=3.7.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "Pillow>=9.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=21.0",
+    "flake8>=3.8",
+    "mypy>=0.800",
+]
+docs = [
+    "sphinx>=4.0",
+    "sphinx-rtd-theme>=0.5",
+    "myst-parser>=0.15",
+]
+
+[project.scripts]
+vasp-dos-plotter = "vasp_dos_plotter.gui:main"
+vasp-dos-plot = "vasp_dos_plotter.gui:main"
+
+[project.urls]
+Homepage = "https://github.com/zeinabfard/vasp-dos-plotter"
+Repository = "https://github.com/zeinabfard/vasp-dos-plotter"
+Documentation = "https://github.com/zeinabfard/vasp-dos-plotter#readme"
+"Bug Tracker" = "https://github.com/zeinabfard/vasp-dos-plotter/issues"
+
+[tool.setuptools]
+packages = ["vasp_dos_plotter"]
+package-dir = {"" = "."}
+
+[tool.setuptools.package-data]
+"*" = ["*.png", "*.jpg", "*.ico", "*.txt", "*.md", "*.bat"]
+
+[tool.setuptools_scm]
+write_to = "vasp_dos_plotter/_version.py"
+
+[tool.black]
+line-length = 88
+target-version = ['py37']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"

@@ -1084,15 +1084,87 @@ class DOSPlotterGUI:
         about_window.title("About VASP DOS Plotter")
         about_window.geometry("500x550")
         about_window.configure(bg='#f0f0f0')
-        about_window.resizable(False, False)
+        about_window.resizable(True, True)
         
         # Center the window
         about_window.transient(self.root)
         about_window.grab_set()
         
-        # Main frame
-        main_frame = tk.Frame(about_window, bg='#f0f0f0')
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        # Create a main container frame with padding
+        container_frame = tk.Frame(about_window, bg='#f0f0f0')
+        container_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        # Create a canvas and scrollbar for scrolling
+        canvas = tk.Canvas(container_frame, bg='#f0f0f0', highlightthickness=0)
+        scrollbar = ttk.Scrollbar(container_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg='#f0f0f0')
+        
+        # Configure scrolling
+        def update_scroll_region(event=None):
+            # Update scroll region
+            canvas.configure(scrollregion=canvas.bbox("all"))
+            
+            # Get the required height of the scrollable frame
+            scrollable_frame.update_idletasks()
+            required_height = scrollable_frame.winfo_reqheight()
+            canvas_height = canvas.winfo_height()
+            
+            # Only show scrollbar if content is taller than canvas
+            if required_height > canvas_height:
+                scrollbar.pack(side="right", fill="y")
+                canvas.configure(yscrollcommand=scrollbar.set)
+            else:
+                scrollbar.pack_forget()
+                canvas.configure(yscrollcommand=None)
+        
+        scrollable_frame.bind("<Configure>", update_scroll_region)
+        
+        # Create window in canvas and configure scrolling
+        canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        
+        # Pack canvas (scrollbar will be packed conditionally)
+        canvas.pack(side="left", fill="both", expand=True)
+        
+        # Bind canvas resize to update content width
+        def on_canvas_resize(event):
+            canvas_width = canvas.winfo_width()
+            if canvas_width > 1:
+                canvas.itemconfig(canvas_window, width=canvas_width)
+        
+        canvas.bind("<Configure>", on_canvas_resize)
+        
+        # Bind mousewheel to canvas
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        
+        # Clean up mousewheel binding when window closes
+        def _on_closing():
+            canvas.unbind_all("<MouseWheel>")
+            about_window.destroy()
+        about_window.protocol("WM_DELETE_WINDOW", _on_closing)
+        
+        # Main frame (now scrollable) - ensure proper width and alignment
+        main_frame = scrollable_frame
+        
+        # Update canvas when scrollable frame changes
+        def configure_scroll_region(event):
+            # Update scroll region and check if scrollbar is needed
+            update_scroll_region(event)
+            
+            # Make content fill the full canvas width
+            canvas_width = canvas.winfo_width()
+            if canvas_width > 1:  # Avoid setting width to 0
+                canvas.itemconfig(canvas_window, width=canvas_width)
+        
+        scrollable_frame.bind("<Configure>", configure_scroll_region)
+        
+        # Force initial update after a short delay
+        def initial_update():
+            canvas.update_idletasks()
+            configure_scroll_region(None)
+        
+        about_window.after(100, initial_update)
         
         # Try to load and display the logo
         try:
@@ -1205,7 +1277,7 @@ License: MIT Open Source"""
         mission_label.pack(pady=(0, 15))
         
         # Close button
-        close_button = tk.Button(main_frame, text="Close", command=about_window.destroy,
+        close_button = tk.Button(main_frame, text="Close", command=_on_closing,
                                 font=('Arial', 10, 'bold'), bg='#3498db', fg='white',
                                 relief=tk.FLAT, padx=20, pady=5)
         close_button.pack(pady=(10, 0))

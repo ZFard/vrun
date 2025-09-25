@@ -6,6 +6,6 @@ REM Activate virtual environment
 call venv\Scripts\activate.bat
 
 REM Launch the GUI application
-python dos_plotter_gui.py
+python run_gui.py
 
 pause

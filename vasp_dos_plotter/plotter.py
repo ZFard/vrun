@@ -5,6 +5,7 @@ Plot real DOS data from VASP RES/DOS0 file
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 def read_dos_file(filename="RES/DOS0"):
     """
@@ -97,6 +98,39 @@ def save_filtered_data(energies, dos_values, energy_range=(-7, 7), filename="fil
             f.write(f"{energy:.6f}\t{dos:.6f}\n")
     
     print(f"Filtered DOS data saved to '{filename}'")
+
+def plot_dos_file(file_path, energy_range=(-7, 7), output_file=None):
+    """
+    Plot DOS data from a file with specified energy range
+    
+    Args:
+        file_path (str): Path to the DOS file
+        energy_range (tuple): Energy range (min, max) in eV
+        output_file (str): Optional output file path
+    """
+    energies, total_dos = read_dos_file(file_path)
+    
+    # Filter data within energy range
+    mask = (energies >= energy_range[0]) & (energies <= energy_range[1])
+    filtered_energies = energies[mask]
+    filtered_dos = total_dos[mask]
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(filtered_energies, filtered_dos, 'b-', linewidth=2, label='Total DOS')
+    plt.axvline(x=0, color='r', linestyle='--', alpha=0.7, label='Fermi Level')
+    plt.xlabel('Energy (eV)')
+    plt.ylabel('Density of States (states/eV)')
+    plt.title(f'Density of States - {os.path.basename(file_path)}')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.xlim(energy_range)
+    
+    if output_file:
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to {output_file}")
+    else:
+        plt.show()
 
 if __name__ == "__main__":
     print("Real VASP DOS Plotting Script")

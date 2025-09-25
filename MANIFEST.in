@@ -1,0 +1,34 @@
+# Include documentation
+include README.md
+include LICENSE
+include CONTRIBUTING.md
+include CHANGELOG.md
+include GUI_USAGE_GUIDE.md
+include ABOUT.md
+include AUTHOR.md
+
+# Include requirements
+include requirements.txt
+
+# Include graphics
+include logo.png
+include icon.png
+include favicon.png
+include DrZ.png
+
+# Include launcher scripts
+include launch_gui.bat
+
+# Include sample data
+recursive-include RES *.txt *.dat *.out
+
+# Exclude development files
+exclude .gitignore
+exclude .gitattributes
+exclude setup.py
+exclude MANIFEST.in
+
+# Exclude virtual environment
+recursive-exclude venv *
+recursive-exclude __pycache__ *
+recursive-exclude *.pyc *
