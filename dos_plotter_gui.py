@@ -869,18 +869,21 @@ class DOSPlotterGUI:
             
             # Plot each file with different color
             all_dos_values = []
-            for i, (energies, dos_values, filename) in enumerate(self.multi_file_data):
+            for i, (energies, dos_values, file_path) in enumerate(self.multi_file_data):
                 # Filter data
                 mask = (energies >= energy_min) & (energies <= energy_max)
                 filtered_energies = energies[mask]
                 filtered_dos = dos_values[mask]
                 
                 if len(filtered_energies) > 0:
-                    # Plot with unique color and filename as label
+                    # Format legend label with path information
+                    legend_label = self.format_legend_label(file_path)
+                    
+                    # Plot with unique color and formatted path as label
                     self.ax.plot(filtered_energies, filtered_dos, 
                                color=colors[i],
                                linewidth=self.line_width_var.get(),
-                               label=filename)
+                               label=legend_label)
                     all_dos_values.extend(filtered_dos)
             
             if not all_dos_values:
@@ -1267,8 +1270,7 @@ License: MIT Open Source"""
                     try:
                         energies, dos_values = self.read_dos_file(file_path)
                         if len(energies) > 0:
-                            filename = os.path.splitext(os.path.basename(file_path))[0]
-                            file_data.append((energies, dos_values, filename))
+                            file_data.append((energies, dos_values, file_path))
                     except Exception as e:
                         print(f"Error loading {file_path}: {str(e)}")
                 
@@ -1305,18 +1307,21 @@ License: MIT Open Source"""
             colors = self.generate_colors(len(file_data))
             
             # Plot each file with different color
-            for i, (energies, dos_values, filename) in enumerate(file_data):
+            for i, (energies, dos_values, file_path) in enumerate(file_data):
                 # Filter data
                 mask = (energies >= energy_min) & (energies <= energy_max)
                 filtered_energies = energies[mask]
                 filtered_dos = dos_values[mask]
                 
                 if len(filtered_energies) > 0:
-                    # Plot with unique color and filename as label
+                    # Format legend label with path information
+                    legend_label = self.format_legend_label(file_path)
+                    
+                    # Plot with unique color and formatted path as label
                     self.ax.plot(filtered_energies, filtered_dos, 
                                color=colors[i],
                                linewidth=self.line_width_var.get(),
-                               label=filename)
+                               label=legend_label)
             
             # Add Fermi level if enabled
             if self.show_fermi_var.get():
@@ -1381,6 +1386,42 @@ License: MIT Open Source"""
             colors = [f'C{i}' for i in range(num_colors)]
             
         return colors
+        
+    def format_legend_label(self, file_path):
+        """Format file path for legend display"""
+        import os
+        
+        # Get current working directory
+        cwd = os.getcwd()
+        
+        # Make path relative to current directory if possible
+        try:
+            rel_path = os.path.relpath(file_path, cwd)
+            if not rel_path.startswith('..'):
+                # Path is within current directory, use relative path
+                display_path = rel_path
+            else:
+                # Path is outside current directory, use absolute path
+                display_path = file_path
+        except ValueError:
+            # Can't make relative path (different drives on Windows), use absolute
+            display_path = file_path
+        
+        # Trim long paths with ellipsis
+        max_length = 50  # Maximum characters for legend label
+        if len(display_path) > max_length:
+            # Find a good place to cut (prefer cutting at path separators)
+            cut_point = max_length - 3  # Leave room for "..."
+            
+            # Try to cut at a path separator
+            for i in range(cut_point, max(0, cut_point - 10), -1):
+                if display_path[i] in ['/', '\\']:
+                    cut_point = i
+                    break
+            
+            display_path = display_path[:cut_point] + "..."
+        
+        return display_path
         
     def clear_multi_plot(self):
         """Clear the multi-file plot"""
