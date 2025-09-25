@@ -32,6 +32,9 @@ env.bak/
 venv.bak/
 .venv/
 
+# Private Files
+RES-Private/
+
 # IDE and Editor files
 .vscode/
 .idea/

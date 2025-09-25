@@ -1,7 +1,7 @@
 # About the Author
 
 <div align="center">
-  <img src="RES/Mascot.jpg" alt="Zeinab H. Fard" width="200" height="200" style="border-radius: 50%;">
+  <img src="DrZ.png" alt="Zeinab H. Fard" width="200" height="200" style="border-radius: 50%;">
   <br>
   <h2>👋 Hi, I'm <strong>Zeinab H. Fard</strong></h2>
   <p><em>Ph.D. Researcher in Chemical and Biological Engineering</em><br>

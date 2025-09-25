@@ -7,7 +7,7 @@ The **VASP DOS Plotter** is a comprehensive tool designed for visualizing Densit
 ## 👨‍🔬 Meet the Author
 
 <div align="center">
-  <img src="RES/Mascot.jpg" alt="Zeinab H. Fard" width="200" height="200" style="border-radius: 50%;">
+  <img src="DrZ.png" alt="Zeinab H. Fard" width="200" height="200" style="border-radius: 50%;">
   <br>
   <h3>👋 Hi, I'm <strong>Zeinab H. Fard</strong></h3>
   <p><em>Ph.D. Researcher in Chemical and Biological Engineering</em><br>
@@ -23,7 +23,7 @@ I enjoy building open-source solutions at the intersection of **programming, che
 ## 🎨 Our Mascot
 
 <div align="center">
-  <img src="RES/Mascot.jpg" alt="VASP DOS Plotter Mascot" width="300" height="300">
+  <img src="DrZ.png" alt="VASP DOS Plotter Mascot" width="300" height="300">
   <br>
   <em>Meet our friendly mascot! 🧪⚡</em>
 </div>

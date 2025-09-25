@@ -17,9 +17,12 @@ vrun/
 ├── ABOUT.md            # About section with mascot and project details
 ├── AUTHOR.md           # Author information and background
 ├── GUI_USAGE_GUIDE.md  # Detailed GUI usage guide
+├── logo.png            # Professional logo for the application
+├── icon.png            # Application icon
+├── favicon.png         # Favicon for web interfaces
+├── DrZ.png             # Project mascot and author photo
 ├── RES/
-│   ├── DOS0            # Real VASP DOS data file
-│   └── Mascot.jpg      # Project mascot and author photo
+│   └── DOS0            # Real VASP DOS data file
 └── venv/               # Python virtual environment
 ```
 
@@ -64,12 +67,15 @@ launch_gui.bat
 ```
 
 **GUI Features:**
-- 📁 **File Management**: Browse and load DOS files easily
-- ⚙️ **Customizable Settings**: Adjust energy range, colors, fonts, and more
-- 📊 **Real-time Plotting**: See changes instantly as you adjust settings
+- 📁 **File Management**: Browse and load DOS files easily with smart file type detection
+- ⚙️ **Customizable Settings**: Adjust energy range, colors, fonts, and more with interactive sliders
+- 📊 **Real-time Plotting**: See changes instantly as you adjust settings with debounced updates
 - 💾 **Multiple Export Options**: Save plots as PNG, PDF, SVG or export data as CSV
-- 🎯 **Smart Defaults**: Auto-detect optimal energy ranges
+- 🎯 **Smart Defaults**: Auto-detect optimal energy ranges for both single and multi-file modes
 - 📈 **Professional Output**: High-quality plots suitable for publications
+- 🔄 **Multi-File Plotting**: Compare multiple DOS files in a single plot with different colors and smart legend
+- 🎨 **Context-Aware Settings**: Sliders and controls adapt to single-file vs multi-file plotting modes
+- 📍 **Smart Legend**: File paths shown in legend with intelligent truncation and formatting
 
 ### Method 2: Command Line Script
 
@@ -137,17 +143,20 @@ If Python plotting doesn't work, you can:
 ## GUI Application Features
 
 ### 📁 File Management
-- **Browse Files**: Easy file selection with dialog
+- **Browse Files**: Easy file selection with dialog (defaults to "All files")
 - **Quick Load**: One-click loading of `RES/DOS0` or sample data
 - **File Info**: Display data statistics and file details
 - **Multiple Formats**: Support for various DOS file formats
+- **Tabbed Interface**: Separate tabs for single file and multi-file operations
 
 ### ⚙️ Customizable Settings
-- **Energy Range**: Adjustable min/max bounds with auto-detection
+- **Energy Range**: Adjustable min/max bounds with interactive sliders and auto-detection
 - **Line Properties**: Width, color, and style customization
 - **Fermi Level**: Toggle display with color options
 - **Grid Settings**: Show/hide grid with transparency control
 - **Font Control**: Adjustable font sizes for labels and titles
+- **Context-Aware**: Settings adapt to single-file vs multi-file plotting modes
+- **Real-time Updates**: Debounced slider updates for smooth interaction
 
 ### 📊 Real-time Plotting
 - **Live Updates**: See changes instantly as you adjust settings
@@ -163,14 +172,18 @@ If Python plotting doesn't work, you can:
 - **Settings Save/Load**: Preserve your preferences
 
 ### 🎯 Smart Features
-- **Auto-detect Range**: Automatically find optimal energy bounds
-- **Zoom to Data**: Quick view of full data range
+- **Auto-detect Range**: Automatically find optimal energy bounds for single or multi-file data
+- **Zoom to Data**: Quick view of full data range (context-aware for current mode)
 - **Reset View**: Return to default settings
 - **Error Handling**: Graceful handling of file issues
+- **Multi-File Comparison**: Plot multiple DOS files together with different colors
+- **Smart Legend**: Intelligent file path formatting with truncation
+- **Color Schemes**: Multiple color palettes (auto, rainbow, viridis, plasma, tab10)
+- **Threaded Processing**: Non-blocking file loading and plot updates
 
 ## File Descriptions
 
-- **dos_plotter_gui.py**: Main GUI application with interactive sliders and real-time updates
+- **dos_plotter_gui.py**: Main GUI application with interactive sliders, multi-file plotting, and context-aware settings
 - **plot_real_dos.py**: Command-line script for real VASP DOS data plotting
 - **launch_gui.bat**: Windows launcher for the GUI application
 - **requirements.txt**: Python package dependencies
@@ -179,7 +192,10 @@ If Python plotting doesn't work, you can:
 - **AUTHOR.md**: Author information and background (Zeinab H. Fard, Ph.D. researcher)
 - **GUI_USAGE_GUIDE.md**: Detailed guide for using the GUI application
 - **RES/DOS0**: Real VASP DOS data file (your actual data)
-- **RES/Mascot.jpg**: Project mascot and author photo
+- **logo.png**: Professional logo for the application
+- **icon.png**: Application icon for window title bar
+- **favicon.png**: Favicon for web interfaces
+- **DrZ.png**: Project mascot and author photo
 - **venv/**: Python virtual environment with all dependencies
 
 ## Requirements
@@ -189,6 +205,7 @@ If Python plotting doesn't work, you can:
 - pymatgen
 - matplotlib
 - numpy
+- Pillow (for image handling in About dialog)
 
 ### For Basic Functionality
 - Python 3.7+ (built-in libraries only)

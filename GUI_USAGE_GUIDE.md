@@ -1,6 +1,6 @@
 # VASP DOS Plotter GUI - Usage Guide
 
-## 🚀 **Improved Features for Better Usability**
+## 🚀 **Advanced Features for Professional DOS Analysis**
 
 ### **Real-time Updates**
 - ✅ **Automatic Plot Updates**: Changes to settings now update the plot automatically
@@ -8,12 +8,20 @@
 - ✅ **Input Validation**: Real-time validation of energy range inputs
 - ✅ **Progress Indicators**: Visual feedback on all operations
 
-### **🎯 NEW: Interactive Sliders**
+### **🎯 Interactive Sliders**
 - ✅ **Fun Range Adjustment**: Drag sliders for smooth, interactive energy range control
 - ✅ **Real-time Feedback**: See plot updates as you drag the sliders
 - ✅ **Smart Validation**: Sliders automatically prevent min > max conflicts
 - ✅ **Dynamic Ranges**: Slider ranges adjust based on your data
 - ✅ **Visual Feedback**: Live display of current range values
+- ✅ **Context-Aware**: Sliders adapt to single-file vs multi-file plotting modes
+
+### **🔄 Multi-File Plotting**
+- ✅ **Comparative Analysis**: Plot multiple DOS files together in a single plot
+- ✅ **Color Differentiation**: Each file gets a unique color from selectable schemes
+- ✅ **Smart Legend**: File paths shown with intelligent truncation and formatting
+- ✅ **Context-Aware Settings**: All controls adapt to multi-file mode
+- ✅ **Threaded Processing**: Non-blocking file loading for multiple files
 
 ### **Enhanced Responsiveness**
 - ✅ **Threaded File Loading**: Large files load without freezing the interface
@@ -24,10 +32,11 @@
 ## 📋 **How to Use the Improved GUI**
 
 ### **1. Loading Data**
-- **Browse**: Click "Browse" to select any DOS file
+- **Browse**: Click "Browse" to select any DOS file (defaults to "All files")
 - **Quick Load**: Use "Load RES/DOS0" for your real VASP data
 - **Sample Data**: Click "Load Sample" for demonstration
 - **Progress**: Watch the progress indicator during loading
+- **Tabbed Interface**: Switch between "Single File" and "Multi-File Plot" tabs
 
 ### **2. Energy Range Settings**
 - **Text Entry**: Type in the energy range fields and see updates automatically
@@ -43,17 +52,45 @@
 - **Grid Options**: Toggle grid and adjust transparency
 - **Font Control**: Change font sizes and see results instantly
 
-### **4. Plot Controls**
+### **4. Multi-File Plotting** 🔄
+- **Add Files**: Click "Add Files" to select multiple DOS files for comparison
+- **File Management**: Use "Clear List" or "Remove Selected" to manage your file list
+- **Color Schemes**: Choose from auto, rainbow, viridis, plasma, or tab10 color palettes
+- **Plot All Together**: Create a single plot with all selected files
+- **Smart Legend**: Each file appears with its path (intelligently truncated)
+- **Clear Plot**: Reset to empty plot state
+- **Save Multi-Plot**: Export the combined visualization
+
+### **5. Plot Controls**
 - **Update Plot**: Manual refresh if needed
 - **Reset View**: Return to auto-detected settings
-- **Zoom to Data**: Show full data range
+- **Zoom to Data**: Show full data range (context-aware for current mode)
 - **Progress Indicator**: Shows current operation status
 
-### **5. Export Options**
+### **6. Export Options**
 - **Multiple Formats**: PNG, PDF, SVG support
 - **High Resolution**: Adjustable DPI up to 600
 - **Custom Sizing**: Set figure dimensions
 - **Data Export**: Save filtered data as CSV
+
+## 🎯 **Context-Aware Features**
+
+### **Smart Mode Detection**
+- **Single File Mode**: Automatically activated when loading individual files
+- **Multi-File Mode**: Automatically activated when creating multi-file plots
+- **Mode Indicators**: Slider info shows "Single file Range" vs "Multi-file Range"
+- **Adaptive Controls**: All settings adapt to the current plotting mode
+
+### **Intelligent Auto-Detection**
+- **Single File**: Uses data from the loaded file for range detection
+- **Multi-File**: Uses combined data from all selected files for optimal range
+- **Context Messages**: Shows "Single file auto-detected" vs "Multi-file auto-detected"
+
+### **Smart Legend Formatting**
+- **Path Display**: Shows file paths instead of just filenames
+- **Directory Removal**: Removes current working directory when possible
+- **Intelligent Truncation**: Truncates long paths with ellipsis (...)
+- **Maximum Length**: Limits legend labels to 50 characters for readability
 
 ## 🔧 **Troubleshooting**
 

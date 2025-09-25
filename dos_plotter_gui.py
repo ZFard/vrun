@@ -23,6 +23,16 @@ class DOSPlotterGUI:
         self.root.geometry("1200x680")
         self.root.configure(bg='#f0f0f0')
         
+        # Try to set window icon
+        try:
+            icon_path = "icon.png"
+            if os.path.exists(icon_path):
+                icon_image = Image.open(icon_path)
+                icon_photo = ImageTk.PhotoImage(icon_image)
+                self.root.iconphoto(True, icon_photo)
+        except Exception as e:
+            print(f"Could not load window icon: {e}")
+        
         # Data storage
         self.energies = None
         self.dos_values = None
@@ -473,7 +483,7 @@ class DOSPlotterGUI:
         plot_frame.pack(fill='both', expand=True)
         
         # Create matplotlib figure
-        self.fig = Figure(figsize=(8, 5), dpi=100)
+        self.fig = Figure(figsize=(8, 4), dpi=100)
         self.ax = self.fig.add_subplot(111)
         
         # Create canvas
@@ -509,7 +519,7 @@ class DOSPlotterGUI:
         """Open file dialog"""
         file_path = filedialog.askopenfilename(
             title="Select DOS File",
-            filetypes=[("DOS files (no extension)", "*."), ("All files", "*.*"), ("Text files", "*.txt")]
+            filetypes=[("All files", "*.*"), ("DOS files (no extension)", "*."), ("Text files", "*.txt")]
         )
         if file_path:
             self.load_file(file_path)
@@ -908,7 +918,7 @@ class DOSPlotterGUI:
                 self.ax.grid(True, alpha=self.grid_alpha_var.get())
             
             # Add legend
-            self.ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            self.ax.legend()
             self.ax.set_xlim(energy_min, energy_max)
             
             # Auto-scale y-axis based on all data
@@ -1084,11 +1094,25 @@ class DOSPlotterGUI:
         main_frame = tk.Frame(about_window, bg='#f0f0f0')
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # Title
-        title_label = tk.Label(main_frame, text="VASP DOS Plotter", 
-                              font=('Arial', 18, 'bold'), bg='#f0f0f0', fg='#2c3e50')
-        title_label.pack(pady=(0, 5))
+        # Try to load and display the logo
+        try:
+            logo_path = "logo.png"
+            if os.path.exists(logo_path):
+                logo_image = Image.open(logo_path)
+                # Resize logo to fit nicely in the dialog
+                logo_image = logo_image.resize((300, 150), Image.Resampling.LANCZOS)
+                logo_photo = ImageTk.PhotoImage(logo_image)
+                logo_label = tk.Label(main_frame, image=logo_photo, bg='#f0f0f0')
+                logo_label.image = logo_photo  # Keep a reference
+                logo_label.pack(pady=(0, 10))
+        except Exception as e:
+            print(f"Could not load logo: {e}")
+            # Fallback to text title
+            title_label = tk.Label(main_frame, text="VASP DOS Plotter", 
+                                  font=('Arial', 18, 'bold'), bg='#f0f0f0', fg='#2c3e50')
+            title_label.pack(pady=(0, 5))
         
+        # Version
         subtitle_label = tk.Label(main_frame, text="Professional Edition v1.0", 
                                  font=('Arial', 10, 'italic'), bg='#f0f0f0', fg='#7f8c8d')
         subtitle_label.pack(pady=(0, 15))
@@ -1099,7 +1123,7 @@ class DOSPlotterGUI:
         
         # Try to load and display the mascot/author photo with proper aspect ratio
         try:
-            mascot_path = os.path.join("RES", "Mascot.jpg")
+            mascot_path = "DrZ.png"
             if os.path.exists(mascot_path):
                 # Load the image and maintain aspect ratio
                 image = Image.open(mascot_path)
@@ -1225,7 +1249,7 @@ License: MIT Open Source"""
         """Add files to multi-file plotting list"""
         file_paths = filedialog.askopenfilenames(
             title="Select DOS Files for Multi-File Plotting",
-            filetypes=[("DOS files (no extension)", "*."), ("All files", "*.*"), ("Text files", "*.txt")]
+            filetypes=[("All files", "*.*"), ("DOS files (no extension)", "*."), ("Text files", "*.txt")]
         )
         
         for file_path in file_paths:
@@ -1338,7 +1362,7 @@ License: MIT Open Source"""
                 self.ax.grid(True, alpha=self.grid_alpha_var.get())
             
             # Add legend
-            self.ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            self.ax.legend()
             self.ax.set_xlim(energy_min, energy_max)
             
             # Auto-scale y-axis based on all data
@@ -1487,7 +1511,7 @@ License: MIT Open Source"""
                 if self.show_grid_var.get():
                     ax.grid(True, alpha=self.grid_alpha_var.get())
                 
-                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+                ax.legend()
                 ax.set_xlim(energy_min, energy_max)
                 
                 # Copy y-axis limits
