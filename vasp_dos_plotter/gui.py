@@ -1005,13 +1005,13 @@ class DOSPlotterGUI:
                     # Multi-file plot
                     colors = self.generate_colors(len(self.multi_file_data))
                     
-                    for i, (energies, dos_values, file_path) in enumerate(self.multi_file_data):
+                    for i, (energies, dos_values, data_file_path) in enumerate(self.multi_file_data):
                         mask = (energies >= energy_min) & (energies <= energy_max)
                         filtered_energies = energies[mask]
                         filtered_dos = dos_values[mask]
                         
                         if len(filtered_energies) > 0:
-                            legend_label = self.format_legend_label(file_path)
+                            legend_label = self.format_legend_label(data_file_path)
                             ax.plot(filtered_energies, filtered_dos, 
                                    color=colors[i],
                                    linewidth=self.line_width_var.get(),
@@ -1086,7 +1086,7 @@ class DOSPlotterGUI:
                         # Multi-file export - create columns for each file
                         # First, collect all unique energy points
                         all_energies = set()
-                        for energies, dos_values, file_path in self.multi_file_data:
+                        for energies, dos_values, data_file_path in self.multi_file_data:
                             mask = (energies >= energy_min) & (energies <= energy_max)
                             filtered_energies = energies[mask]
                             all_energies.update(filtered_energies)
@@ -1095,15 +1095,15 @@ class DOSPlotterGUI:
                         
                         # Write header with file names
                         f.write("Energy(eV)")
-                        for _, _, file_path in self.multi_file_data:
-                            filename = os.path.basename(file_path)
+                        for _, _, data_file_path in self.multi_file_data:
+                            filename = os.path.basename(data_file_path)
                             f.write(f",{filename}")
                         f.write("\n")
                         
                         # Write data rows
                         for energy in all_energies:
                             f.write(f"{energy:.6f}")
-                            for energies, dos_values, file_path in self.multi_file_data:
+                            for energies, dos_values, data_file_path in self.multi_file_data:
                                 mask = (energies >= energy_min) & (energies <= energy_max)
                                 filtered_energies = energies[mask]
                                 filtered_dos = dos_values[mask]
