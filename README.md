@@ -5,6 +5,12 @@ This project demonstrates how to create Density of States (DOS) plots using VASP
 > 📖 **Learn More**: Check out our [About Section](ABOUT.md) to meet our mascot and learn about the project's mission! 🎨  
 > 👨‍🔬 **Meet the Author**: Learn about [Zeinab H. Fard](AUTHOR.md), the Ph.D. researcher behind this project! 🧪
 
+## GUI Application Screenshot
+
+![VASP DOS Plotter GUI](screenshot.png)
+
+*The intuitive graphical interface makes it easy to load DOS files, customize plot settings, and export high-quality plots for publications.*
+
 ## Project Structure
 
 ```
