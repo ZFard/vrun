@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 - Python 3.7+ compatibility
-- Dependencies: pymatgen, matplotlib, numpy, Pillow
+- Dependencies: matplotlib, numpy, Pillow
 - Cross-platform support (Windows, macOS, Linux)
 - Professional GUI with tkinter
 - Threaded file operations

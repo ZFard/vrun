@@ -81,7 +81,7 @@ python plot_real_dos.py
 - **tkinter**: Native GUI framework for cross-platform support
 - **matplotlib**: Professional scientific plotting
 - **numpy**: High-performance numerical computing
-- **pymatgen**: Advanced materials science data processing
+- **Pillow**: Image processing for GUI elements
 
 ## 📋 **Usage Scenarios**
 

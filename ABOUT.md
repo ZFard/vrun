@@ -46,7 +46,7 @@ I enjoy building open-source solutions at the intersection of **programming, che
 - **tkinter**: Cross-platform GUI framework
 - **matplotlib**: Professional plotting and visualization
 - **numpy**: Numerical computations and data handling
-- **pymatgen**: Materials science data processing
+- **Pillow**: Image processing for GUI elements
 - **Threading**: Asynchronous operations for responsive UI
 
 ## 📊 Supported Data Formats

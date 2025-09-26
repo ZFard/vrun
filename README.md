@@ -64,7 +64,7 @@ vrun/
 
 Install packages directly to your system Python:
 ```bash
-pip install pymatgen matplotlib numpy
+pip install matplotlib numpy Pillow
 ```
 
 ## Usage
@@ -226,7 +226,6 @@ If Python plotting doesn't work, you can:
 
 ### For Full Functionality
 - Python 3.7+
-- pymatgen
 - matplotlib
 - numpy
 - Pillow (for image handling in About dialog)
