@@ -72,10 +72,10 @@ vasp-dos-plotter = "vasp_dos_plotter.gui:main"
 vasp-dos-plot = "vasp_dos_plotter.gui:main"
 
 [project.urls]
-Homepage = "https://github.com/zeinabfard/vasp-dos-plotter"
-Repository = "https://github.com/zeinabfard/vasp-dos-plotter"
-Documentation = "https://github.com/zeinabfard/vasp-dos-plotter#readme"
-"Bug Tracker" = "https://github.com/zeinabfard/vasp-dos-plotter/issues"
+Homepage = "https://github.com/zfard/vrun"
+Repository = "https://github.com/zfard/vrun"
+Documentation = "https://github.com/zfard/vrun#readme"
+"Bug Tracker" = "https://github.com/zfard/vrun/issues"
 
 [tool.setuptools]
 packages = ["vasp_dos_plotter"]
