@@ -33,8 +33,7 @@
 
 ### **1. Loading Data**
 - **Browse**: Click "Browse" to select any DOS file (defaults to "All files")
-- **Quick Load**: Use "Load RES/DOS0" for your real VASP data
-- **Sample Data**: Click "Load Sample" for demonstration
+- **Sample Data**: Click "Load Sample" for demonstration (automatically loads on startup)
 - **Progress**: Watch the progress indicator during loading
 - **Tabbed Interface**: Switch between "Single File" and "Multi-File Plot" tabs
 
@@ -142,8 +141,8 @@
 
 ## 🎯 **Quick Start Checklist**
 
-1. ✅ **Launch GUI**: `python dos_plotter_gui.py`
-2. ✅ **Load Data**: Click "Load RES/DOS0" or browse for your file
+1. ✅ **Launch GUI**: `python run_gui.py`
+2. ✅ **Load Data**: Click "Load Sample" or browse for your file
 3. ✅ **Set Range**: Use -7 to 7 eV or click "Auto-detect Range"
 4. ✅ **Customize**: Adjust colors, fonts, and appearance as needed
 5. ✅ **Export**: Save your plot in desired format

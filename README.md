@@ -1,6 +1,6 @@
 # VASP DOS Plotting Project
 
-This project demonstrates how to create Density of States (DOS) plots using VASP output files (vasprun.xml) and provides multiple plotting options.
+This project demonstrates how to create Density of States (DOS) plots using VASP output files and provides multiple plotting options.
 
 > 📖 **Learn More**: Check out our [About Section](ABOUT.md) to meet our mascot and learn about the project's mission! 🎨  
 > 👨‍🔬 **Meet the Author**: Learn about [Zeinab H. Fard](AUTHOR.md), the Ph.D. researcher behind this project! 🧪
@@ -110,7 +110,7 @@ python -m vasp_dos_plotter.plotter
 ```
 
 This script:
-- Reads real VASP DOS files (like `RES/DOS0`)
+- Reads VASP DOS files (like `RES/DOS0`)
 - Creates professional plots with -7 to 7 eV bounds
 - Provides detailed statistics
 - Saves filtered data for further analysis
@@ -126,7 +126,7 @@ This script:
 
 ### Sample Data
 
-The included `vasprun.xml` contains:
+The included sample data contains:
 - A simple hydrogen atom system
 - Energy eigenvalues from -5 to 4 eV
 - DOS data with Gaussian-like peaks
@@ -137,12 +137,12 @@ The included `vasprun.xml` contains:
 ### Common Issues
 
 1. **ImportError for numpy/matplotlib**: 
-   - Try installing with `--user` flag: `pip install --user numpy matplotlib`
+   - Try installing with `--user` flag: `pip install --user numpy matplotlib Pillow`
    - Or use the basic plotting script that doesn't require external packages
 
 2. **VASP file parsing errors**:
    - The script will fall back to synthetic data
-   - Ensure your vasprun.xml is complete and properly formatted
+   - Ensure your DOS file is complete and properly formatted
 
 3. **Virtual environment issues**:
    - Use the basic plotting script as a fallback
@@ -168,7 +168,7 @@ If Python plotting doesn't work, you can:
 
 ### 📁 File Management
 - **Browse Files**: Easy file selection with dialog (defaults to "All files")
-- **Quick Load**: One-click loading of `RES/DOS0` or sample data
+- **Quick Load**: One-click loading of sample data
 - **File Info**: Display data statistics and file details
 - **Multiple Formats**: Support for various DOS file formats
 - **Tabbed Interface**: Separate tabs for single file and multi-file operations
@@ -207,15 +207,15 @@ If Python plotting doesn't work, you can:
 
 ## File Descriptions
 
-- **dos_plotter_gui.py**: Main GUI application with interactive sliders, multi-file plotting, and context-aware settings
-- **plot_real_dos.py**: Command-line script for real VASP DOS data plotting
+- **gui.py**: Main GUI application with interactive sliders, multi-file plotting, and context-aware settings
+- **plotter.py**: Command-line script for VASP DOS data plotting
 - **launch_gui.bat**: Windows launcher for the GUI application
 - **requirements.txt**: Python package dependencies
 - **README.md**: This documentation file
 - **ABOUT.md**: About section with project mascot and detailed project information
 - **AUTHOR.md**: Author information and background (Zeinab H. Fard, Ph.D. researcher)
 - **GUI_USAGE_GUIDE.md**: Detailed guide for using the GUI application
-- **RES/DOS0**: Real VASP DOS data file (your actual data)
+- **RES/DOS0**: Sample VASP DOS data file for testing
 - **logo.png**: Professional logo for the application
 - **icon.png**: Application icon for window title bar
 - **favicon.png**: Favicon for web interfaces
