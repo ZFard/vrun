@@ -468,7 +468,7 @@ def cli_plot_single(file_path, energy_min=-7, energy_max=7, output_file=None,
         if len(energies) == 0:
             print("Error: No valid data found in file")
             return False
-            
+        
         print(f"Loaded {len(energies)} data points")
         print(f"Energy range: {energies.min():.3f} to {energies.max():.3f} eV")
         
@@ -555,11 +555,11 @@ def cli_plot_multi(file_paths, energy_min=-7, energy_max=7, output_file=None,
                 energies, dos_values = read_dos_file(file_path)
                 if len(energies) > 0:
                     multi_file_data.append((energies, dos_values, file_path))
-                    print(f"    ✓ Loaded {len(energies)} data points")
+                    print(f"    [OK] Loaded {len(energies)} data points")
                 else:
-                    print(f"    ✗ No valid data found")
+                    print(f"    [ERROR] No valid data found")
             except Exception as e:
-                print(f"    ✗ Error loading file: {e}")
+                print(f"    [ERROR] Error loading file: {e}")
         
         if not multi_file_data:
             print("Error: No valid files could be loaded")
@@ -738,10 +738,41 @@ def main():
         return
     
     if success:
-        print("✓ Plotting completed successfully!")
+        print("[SUCCESS] Plotting completed successfully!")
     else:
-        print("✗ Plotting failed!")
+        print("[ERROR] Plotting failed!")
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    # Check if we're being run as a module or directly
+    import sys
+    if len(sys.argv) > 1:
+        # Run CLI if arguments are provided
+        main()
+    else:
+        # Run the original demo if no arguments
+        print("Real VASP DOS Plotting Script")
+        print("=" * 40)
+        
+        try:
+            # Read the real DOS data
+            energies, dos_values = read_dos_file("RES/DOS0")
+            
+            print(f"Loaded {len(energies)} data points")
+            print(f"Full energy range: {energies.min():.3f} to {energies.max():.3f} eV")
+            
+            # Plot with -7 to 7 eV bounds as requested
+            plot_dos_real(energies, dos_values, energy_range=(-7, 7))
+            
+            # Save filtered data
+            save_filtered_data(energies, dos_values, energy_range=(-7, 7))
+            
+        except FileNotFoundError:
+            print("Error: RES/DOS0 file not found!")
+            print("Please make sure the DOS file is in the RES/ directory")
+            print("\nTo use CLI mode, run with arguments:")
+            print("  python vasp_dos_plotter/plotter.py --help")
+        except Exception as e:
+            print(f"Error: {e}")
+            print("\nTo use CLI mode, run with arguments:")
+            print("  python vasp_dos_plotter/plotter.py --help")

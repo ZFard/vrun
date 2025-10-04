@@ -11,6 +11,38 @@ This project demonstrates how to create Density of States (DOS) plots using VASP
 
 *The intuitive graphical interface makes it easy to load DOS files, customize plot settings, and export high-quality plots for publications.*
 
+## Command Line Interface
+
+The VASP DOS Plotter also includes a powerful command-line interface for scripting and automation:
+
+### Quick Start
+```bash
+# Quick plot with default settings (using plotter directly)
+python vasp_dos_plotter/plotter.py quick your_dos_file.txt
+
+# Plot with custom range and save
+python vasp_dos_plotter/plotter.py plot single your_dos_file.txt -r -5 5 -o plot.png
+
+# Compare multiple files
+python vasp_dos_plotter/plotter.py plot multi file1.txt file2.txt -c rainbow -o comparison.png
+
+# Demo mode (plots RES/DOS0 if available)
+python vasp_dos_plotter/plotter.py
+
+# Alternative: using standalone CLI script
+python vasp_dos_cli.py quick your_dos_file.txt
+```
+
+### CLI Features
+- **Simple Commands**: Easy-to-remember syntax
+- **Batch Processing**: Handle multiple files at once
+- **Customizable**: Full control over appearance and output
+- **Multiple Formats**: PNG, PDF, SVG support
+- **Scripting Ready**: Perfect for automation
+
+📖 **CLI Documentation**: See [CLI_USAGE_GUIDE.md](CLI_USAGE_GUIDE.md) for comprehensive CLI documentation  
+⚡ **Quick Reference**: See [CLI_QUICK_REFERENCE.md](CLI_QUICK_REFERENCE.md) for common commands
+
 ## Project Structure
 
 ```
@@ -20,6 +52,7 @@ vrun/
 │   ├── gui.py          # Main GUI application
 │   └── plotter.py      # Command-line plotting functionality
 ├── run_gui.py          # Simple GUI launcher
+├── vasp_dos_cli.py     # Standalone CLI script
 ├── launch_gui.bat      # Windows launcher for GUI
 ├── requirements.txt    # Python package requirements
 ├── setup.py            # Package setup script
@@ -28,6 +61,8 @@ vrun/
 ├── ABOUT.md            # About section with mascot and project details
 ├── AUTHOR.md           # Author information and background
 ├── GUI_USAGE_GUIDE.md  # Detailed GUI usage guide
+├── CLI_USAGE_GUIDE.md  # Comprehensive CLI documentation
+├── CLI_QUICK_REFERENCE.md # CLI quick reference card
 ├── CONTRIBUTING.md     # Contribution guidelines
 ├── CHANGELOG.md        # Version history
 ├── CODE_OF_CONDUCT.md  # Code of conduct
