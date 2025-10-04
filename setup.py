@@ -24,11 +24,11 @@ setup(
     description="A professional GUI application for plotting VASP Density of States data",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/zeinabfard/vasp-dos-plotter",
+    url="https://github.com/zfard/vrun",
     project_urls={
-        "Bug Reports": "https://github.com/zeinabfard/vasp-dos-plotter/issues",
-        "Source": "https://github.com/zeinabfard/vasp-dos-plotter",
-        "Documentation": "https://github.com/zeinabfard/vasp-dos-plotter#readme",
+        "Bug Reports": "https://github.com/zfard/vrun/issues",
+        "Source": "https://github.com/zfard/vrun",
+        "Documentation": "https://github.com/zfard/vrun#readme",
     },
     packages=find_packages(),
     classifiers=[

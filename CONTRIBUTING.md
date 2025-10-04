@@ -15,8 +15,8 @@ Thank you for your interest in contributing to the VASP DOS Plotter! This docume
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/your-username/vasp-dos-plotter.git
-   cd vasp-dos-plotter
+   git clone https://github.com/zfard/vrun.git
+   cd vrun
    ```
 
 3. **Create a virtual environment**:
@@ -35,7 +35,7 @@ Thank you for your interest in contributing to the VASP DOS Plotter! This docume
 
 5. **Test the installation**:
    ```bash
-   python dos_plotter_gui.py
+   python run_gui.py
    ```
 
 ## 🛠️ Development Guidelines
@@ -50,15 +50,16 @@ Thank you for your interest in contributing to the VASP DOS Plotter! This docume
 ### Project Structure
 
 ```
-vasp-dos-plotter/
-├── dos_plotter_gui.py      # Main GUI application
-├── plot_real_dos.py        # Command-line plotting script
-├── requirements.txt        # Python dependencies
+vrun/
+├── vasp_dos_plotter/        # Main package directory
+│   ├── gui.py              # Main GUI application
+│   └── plotter.py          # Command-line plotting script
+├── run_gui.py              # GUI launcher
+├── requirements.txt        # Python dependencies (matplotlib, numpy, Pillow)
 ├── README.md              # Project documentation
 ├── LICENSE                # MIT License
 ├── CONTRIBUTING.md        # This file
 ├── .gitignore            # Git ignore rules
-├── .gitattributes        # Git attributes
 ├── logo.png              # Application logo
 ├── icon.png              # Application icon
 ├── favicon.png           # Web favicon

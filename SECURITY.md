@@ -83,7 +83,7 @@ Security updates will be released as patch versions (e.g., 1.0.1, 1.0.2) and wil
 
 For security-related questions or concerns, please contact:
 - **Email**: [zfard@iastate.edu](mailto:zfard@iastate.edu)
-- **GitHub**: [@zeinabfard](https://github.com/zeinabfard)
+- **GitHub**: [@zfard](https://github.com/zfard)
 
 ## Acknowledgments
 

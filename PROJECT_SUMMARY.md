@@ -6,8 +6,9 @@ A professional, interactive GUI application for plotting VASP Density of States 
 ## 📁 **Clean Project Structure**
 ```
 vrun/
-├── dos_plotter_gui.py   # 🎮 Main GUI application with interactive sliders
-├── plot_real_dos.py     # 📊 Command-line script for batch processing
+├── vasp_dos_plotter/     # 🎮 Main package directory
+│   ├── gui.py            # Main GUI application with interactive sliders
+│   └── plotter.py        # Command-line script for batch processing
 ├── launch_gui.bat       # 🚀 Windows launcher
 ├── requirements.txt     # 📦 Python dependencies
 ├── README.md           # 📖 Main documentation
@@ -37,7 +38,7 @@ vrun/
 ### **GUI Application (Recommended)**
 ```bash
 # Launch the interactive GUI
-python dos_plotter_gui.py
+python run_gui.py
 
 # Or use the Windows launcher
 launch_gui.bat
@@ -46,7 +47,7 @@ launch_gui.bat
 ### **Command Line Script**
 ```bash
 # Plot real VASP data
-python plot_real_dos.py
+python -m vasp_dos_plotter.plotter
 ```
 
 ## 🎯 **What Makes This Special**
@@ -81,7 +82,7 @@ python plot_real_dos.py
 - **tkinter**: Native GUI framework for cross-platform support
 - **matplotlib**: Professional scientific plotting
 - **numpy**: High-performance numerical computing
-- **pymatgen**: Advanced materials science data processing
+- **Pillow**: Image processing for GUI elements
 
 ## 📋 **Usage Scenarios**
 

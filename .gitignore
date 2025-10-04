@@ -10,7 +10,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -29,7 +28,6 @@ MANIFEST
 
 # PyInstaller
 *.manifest
-*.spec
 
 # Installer logs
 pip-log.txt
@@ -151,6 +149,7 @@ results/
 !icon.png
 !favicon.png
 !DrZ.png
+!screenshot.png
 
 # Generated data files (keep sample data in RES/)
 filtered_dos_data.txt

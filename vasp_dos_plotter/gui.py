@@ -24,15 +24,15 @@ class DOSPlotterGUI:
         self.root.geometry("1200x680")
         self.root.configure(bg='#f0f0f0')
         
-        # Try to set window icon
+        # Try to set window icon using logo
         try:
-            icon_path = "icon.png"
-            if os.path.exists(icon_path):
-                icon_image = Image.open(icon_path)
-                icon_photo = ImageTk.PhotoImage(icon_image)
-                self.root.iconphoto(True, icon_photo)
+            logo_path = "logo.png"
+            if os.path.exists(logo_path):
+                logo_image = Image.open(logo_path)
+                logo_photo = ImageTk.PhotoImage(logo_image)
+                self.root.iconphoto(True, logo_photo)
         except Exception as e:
-            print(f"Could not load window icon: {e}")
+            print(f"Could not load window logo: {e}")
         
         # Data storage
         self.energies = None
@@ -224,8 +224,6 @@ class DOSPlotterGUI:
         quick_frame = ttk.Frame(single_frame)
         quick_frame.pack(fill='x', pady=(0, 5))
         
-        ttk.Button(quick_frame, text="Load RES/DOS0", 
-                  command=lambda: self.load_file("RES/DOS0")).pack(side='left', padx=(0, 3))
         ttk.Button(quick_frame, text="Load Sample", 
                   command=self.load_sample_data).pack(side='left', padx=(0, 3))
         ttk.Button(quick_frame, text="About", 
@@ -1456,9 +1454,8 @@ def main():
     root = tk.Tk()
     app = DOSPlotterGUI(root)
     
-    # Try to load default file if it exists
-    if os.path.exists("RES/DOS0"):
-        app.load_file("RES/DOS0")
+    # Automatically load sample data on startup
+    app.load_sample_data()
     
     root.mainloop()
 
