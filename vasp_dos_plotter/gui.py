@@ -15,6 +15,7 @@ import threading
 import queue
 import time
 from PIL import Image, ImageTk
+from .plotter import plot_single_dos, plot_multi_dos, create_export_plot, generate_colors, format_legend_label
 
 class DOSPlotterGUI:
     def __init__(self, root):
@@ -794,8 +795,6 @@ class DOSPlotterGUI:
             self.progress_var.set("Updating single file plot...")
             self.root.update_idletasks()
             
-            self.ax.clear()
-            
             # Get current settings with validation
             try:
                 energy_min = float(self.energy_min_var.get())
@@ -808,45 +807,23 @@ class DOSPlotterGUI:
                 self.progress_var.set("Min energy must be less than max")
                 return
             
-            # Filter data
-            mask = (self.energies >= energy_min) & (self.energies <= energy_max)
-            filtered_energies = self.energies[mask]
-            filtered_dos = self.dos_values[mask]
-            
-            if len(filtered_energies) == 0:
-                self.ax.text(0.5, 0.5, 'No data in selected range', 
-                           transform=self.ax.transAxes, ha='center', va='center')
-                self.canvas.draw()
-                self.progress_var.set("No data in range")
-                return
-            
-            # Plot data
-            self.ax.plot(filtered_energies, filtered_dos, 
-                        color=self.line_color_var.get(),
-                        linewidth=self.line_width_var.get(),
-                        label='Total DOS')
-            
-            # Add Fermi level
-            if self.show_fermi_var.get():
-                self.ax.axvline(x=0, color=self.fermi_color_var.get(), 
-                               linestyle='--', alpha=0.7, linewidth=2, 
-                               label='Fermi Level')
-            
-            # Customize plot
-            self.ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
-            self.ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-            self.ax.set_title('VASP Density of States', fontsize=self.title_font_size_var.get(), fontweight='bold')
-            
-            if self.show_grid_var.get():
-                self.ax.grid(True, alpha=self.grid_alpha_var.get())
-            
-            self.ax.legend()
-            self.ax.set_xlim(energy_min, energy_max)
-            
-            # Auto-scale y-axis
-            if self.settings.get('auto_scale', True):
-                y_margin = (filtered_dos.max() - filtered_dos.min()) * 0.05
-                self.ax.set_ylim(filtered_dos.min() - y_margin, filtered_dos.max() + y_margin)
+            # Use the plotter module for plotting
+            filtered_energies, filtered_dos = plot_single_dos(
+                ax=self.ax,
+                energies=self.energies,
+                dos_values=self.dos_values,
+                energy_min=energy_min,
+                energy_max=energy_max,
+                line_color=self.line_color_var.get(),
+                line_width=self.line_width_var.get(),
+                show_fermi=self.show_fermi_var.get(),
+                fermi_color=self.fermi_color_var.get(),
+                show_grid=self.show_grid_var.get(),
+                grid_alpha=self.grid_alpha_var.get(),
+                font_size=self.font_size_var.get(),
+                title_font_size=self.title_font_size_var.get(),
+                auto_scale=self.settings.get('auto_scale', True)
+            )
             
             self.canvas.draw()
             
@@ -865,8 +842,6 @@ class DOSPlotterGUI:
             self.progress_var.set("Updating multi-file plot...")
             self.root.update_idletasks()
             
-            self.ax.clear()
-            
             # Get current settings with validation
             try:
                 energy_min = float(self.energy_min_var.get())
@@ -879,57 +854,22 @@ class DOSPlotterGUI:
                 self.progress_var.set("Min energy must be less than max")
                 return
             
-            # Generate colors based on scheme
-            colors = self.generate_colors(len(self.multi_file_data))
-            
-            # Plot each file with different color
-            all_dos_values = []
-            for i, (energies, dos_values, file_path) in enumerate(self.multi_file_data):
-                # Filter data
-                mask = (energies >= energy_min) & (energies <= energy_max)
-                filtered_energies = energies[mask]
-                filtered_dos = dos_values[mask]
-                
-                if len(filtered_energies) > 0:
-                    # Format legend label with path information
-                    legend_label = self.format_legend_label(file_path)
-                    
-                    # Plot with unique color and formatted path as label
-                    self.ax.plot(filtered_energies, filtered_dos, 
-                               color=colors[i],
-                               linewidth=self.line_width_var.get(),
-                               label=legend_label)
-                    all_dos_values.extend(filtered_dos)
-            
-            if not all_dos_values:
-                self.ax.text(0.5, 0.5, 'No data in selected range', 
-                           transform=self.ax.transAxes, ha='center', va='center')
-                self.canvas.draw()
-                self.progress_var.set("No data in range")
-                return
-            
-            # Add Fermi level if enabled
-            if self.show_fermi_var.get():
-                self.ax.axvline(x=0, color=self.fermi_color_var.get(), 
-                               linestyle='--', alpha=0.7, linewidth=2, 
-                               label='Fermi Level')
-            
-            # Customize plot
-            self.ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
-            self.ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-            self.ax.set_title('Multi-File DOS Comparison', fontsize=self.title_font_size_var.get(), fontweight='bold')
-            
-            if self.show_grid_var.get():
-                self.ax.grid(True, alpha=self.grid_alpha_var.get())
-            
-            # Add legend
-            self.ax.legend()
-            self.ax.set_xlim(energy_min, energy_max)
-            
-            # Auto-scale y-axis based on all data
-            if self.settings.get('auto_scale', True):
-                y_margin = (max(all_dos_values) - min(all_dos_values)) * 0.05
-                self.ax.set_ylim(min(all_dos_values) - y_margin, max(all_dos_values) + y_margin)
+            # Use the plotter module for plotting
+            all_dos_values = plot_multi_dos(
+                ax=self.ax,
+                multi_file_data=self.multi_file_data,
+                energy_min=energy_min,
+                energy_max=energy_max,
+                line_width=self.line_width_var.get(),
+                show_fermi=self.show_fermi_var.get(),
+                fermi_color=self.fermi_color_var.get(),
+                show_grid=self.show_grid_var.get(),
+                grid_alpha=self.grid_alpha_var.get(),
+                font_size=self.font_size_var.get(),
+                title_font_size=self.title_font_size_var.get(),
+                color_scheme=self.color_scheme_var.get(),
+                auto_scale=self.settings.get('auto_scale', True)
+            )
             
             self.canvas.draw()
             
@@ -988,53 +928,26 @@ class DOSPlotterGUI:
                 energy_min = float(self.energy_min_var.get())
                 energy_max = float(self.energy_max_var.get())
                 
-                if self.plotting_mode == "single":
-                    # Single file plot
-                    mask = (self.energies >= energy_min) & (self.energies <= energy_max)
-                    filtered_energies = self.energies[mask]
-                    filtered_dos = self.dos_values[mask]
-                    
-                    ax.plot(filtered_energies, filtered_dos, 
-                           color=self.line_color_var.get(),
-                           linewidth=self.line_width_var.get(),
-                           label='Total DOS')
-                    
-                    plot_title = 'VASP Density of States'
-                    
-                else:  # multi-file mode
-                    # Multi-file plot
-                    colors = self.generate_colors(len(self.multi_file_data))
-                    
-                    for i, (energies, dos_values, data_file_path) in enumerate(self.multi_file_data):
-                        mask = (energies >= energy_min) & (energies <= energy_max)
-                        filtered_energies = energies[mask]
-                        filtered_dos = dos_values[mask]
-                        
-                        if len(filtered_energies) > 0:
-                            legend_label = self.format_legend_label(data_file_path)
-                            ax.plot(filtered_energies, filtered_dos, 
-                                   color=colors[i],
-                                   linewidth=self.line_width_var.get(),
-                                   label=legend_label)
-                    
-                    plot_title = 'Multi-File DOS Comparison'
-                
-                # Add Fermi level if enabled
-                if self.show_fermi_var.get():
-                    ax.axvline(x=0, color=self.fermi_color_var.get(), 
-                              linestyle='--', alpha=0.7, linewidth=2, 
-                              label='Fermi Level')
-                
-                # Customize plot
-                ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
-                ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-                ax.set_title(plot_title, fontsize=self.title_font_size_var.get(), fontweight='bold')
-                
-                if self.show_grid_var.get():
-                    ax.grid(True, alpha=self.grid_alpha_var.get())
-                
-                ax.legend()
-                ax.set_xlim(energy_min, energy_max)
+                # Use the plotter module for export plotting
+                plot_title = create_export_plot(
+                    fig=fig,
+                    ax=ax,
+                    plotting_mode=self.plotting_mode,
+                    energies=self.energies if self.plotting_mode == "single" else None,
+                    dos_values=self.dos_values if self.plotting_mode == "single" else None,
+                    multi_file_data=self.multi_file_data if self.plotting_mode == "multi" else None,
+                    energy_min=energy_min,
+                    energy_max=energy_max,
+                    line_color=self.line_color_var.get(),
+                    line_width=self.line_width_var.get(),
+                    show_fermi=self.show_fermi_var.get(),
+                    fermi_color=self.fermi_color_var.get(),
+                    show_grid=self.show_grid_var.get(),
+                    grid_alpha=self.grid_alpha_var.get(),
+                    font_size=self.font_size_var.get(),
+                    title_font_size=self.title_font_size_var.get(),
+                    color_scheme=self.color_scheme_var.get()
+                )
                 
                 fig.tight_layout()
                 fig.savefig(file_path, dpi=self.dpi_var.get(), bbox_inches='tight')
@@ -1495,58 +1408,22 @@ License: MIT Open Source"""
             energy_min = float(self.energy_min_var.get())
             energy_max = float(self.energy_max_var.get())
             
-            # Clear current plot
-            self.ax.clear()
-            
-            # Generate colors based on scheme
-            colors = self.generate_colors(len(file_data))
-            
-            # Plot each file with different color
-            for i, (energies, dos_values, file_path) in enumerate(file_data):
-                # Filter data
-                mask = (energies >= energy_min) & (energies <= energy_max)
-                filtered_energies = energies[mask]
-                filtered_dos = dos_values[mask]
-                
-                if len(filtered_energies) > 0:
-                    # Format legend label with path information
-                    legend_label = self.format_legend_label(file_path)
-                    
-                    # Plot with unique color and formatted path as label
-                    self.ax.plot(filtered_energies, filtered_dos, 
-                               color=colors[i],
-                               linewidth=self.line_width_var.get(),
-                               label=legend_label)
-            
-            # Add Fermi level if enabled
-            if self.show_fermi_var.get():
-                self.ax.axvline(x=0, color=self.fermi_color_var.get(), 
-                               linestyle='--', alpha=0.7, linewidth=2, 
-                               label='Fermi Level')
-            
-            # Customize plot
-            self.ax.set_xlabel('Energy (eV)', fontsize=self.font_size_var.get())
-            self.ax.set_ylabel('Density of States (states/eV)', fontsize=self.font_size_var.get())
-            self.ax.set_title('Multi-File DOS Comparison', fontsize=self.title_font_size_var.get(), fontweight='bold')
-            
-            if self.show_grid_var.get():
-                self.ax.grid(True, alpha=self.grid_alpha_var.get())
-            
-            # Add legend
-            self.ax.legend()
-            self.ax.set_xlim(energy_min, energy_max)
-            
-            # Auto-scale y-axis based on all data
-            all_dos_values = []
-            for energies, dos_values, _ in file_data:
-                mask = (energies >= energy_min) & (energies <= energy_max)
-                filtered_dos = dos_values[mask]
-                if len(filtered_dos) > 0:
-                    all_dos_values.extend(filtered_dos)
-            
-            if all_dos_values:
-                y_margin = (max(all_dos_values) - min(all_dos_values)) * 0.05
-                self.ax.set_ylim(min(all_dos_values) - y_margin, max(all_dos_values) + y_margin)
+            # Use the plotter module for multi-file plotting
+            all_dos_values = plot_multi_dos(
+                ax=self.ax,
+                multi_file_data=file_data,
+                energy_min=energy_min,
+                energy_max=energy_max,
+                line_width=self.line_width_var.get(),
+                show_fermi=self.show_fermi_var.get(),
+                fermi_color=self.fermi_color_var.get(),
+                show_grid=self.show_grid_var.get(),
+                grid_alpha=self.grid_alpha_var.get(),
+                font_size=self.font_size_var.get(),
+                title_font_size=self.title_font_size_var.get(),
+                color_scheme=self.color_scheme_var.get(),
+                auto_scale=self.settings.get('auto_scale', True)
+            )
             
             self.canvas.draw()
             
@@ -1558,65 +1435,6 @@ License: MIT Open Source"""
             self.bulk_progress_var.set(f"Error creating multi-file plot: {str(e)}")
             messagebox.showerror("Error", f"Failed to create multi-file plot: {str(e)}")
             
-    def generate_colors(self, num_colors):
-        """Generate distinct colors for multiple files"""
-        import matplotlib.cm as cm
-        import matplotlib.colors as mcolors
-        
-        scheme = self.color_scheme_var.get()
-        
-        if scheme == 'auto':
-            # Use matplotlib's default color cycle
-            colors = [f'C{i}' for i in range(num_colors)]
-        elif scheme == 'rainbow':
-            colors = [cm.rainbow(i / max(1, num_colors - 1)) for i in range(num_colors)]
-        elif scheme == 'viridis':
-            colors = [cm.viridis(i / max(1, num_colors - 1)) for i in range(num_colors)]
-        elif scheme == 'plasma':
-            colors = [cm.plasma(i / max(1, num_colors - 1)) for i in range(num_colors)]
-        elif scheme == 'tab10':
-            colors = [cm.tab10(i % 10) for i in range(num_colors)]
-        else:
-            # Fallback to default
-            colors = [f'C{i}' for i in range(num_colors)]
-            
-        return colors
-        
-    def format_legend_label(self, file_path):
-        """Format file path for legend display"""
-        import os
-        
-        # Get current working directory
-        cwd = os.getcwd()
-        
-        # Make path relative to current directory if possible
-        try:
-            rel_path = os.path.relpath(file_path, cwd)
-            if not rel_path.startswith('..'):
-                # Path is within current directory, use relative path
-                display_path = rel_path
-            else:
-                # Path is outside current directory, use absolute path
-                display_path = file_path
-        except ValueError:
-            # Can't make relative path (different drives on Windows), use absolute
-            display_path = file_path
-        
-        # Trim long paths with ellipsis
-        max_length = 50  # Maximum characters for legend label
-        if len(display_path) > max_length:
-            # Find a good place to cut (prefer cutting at path separators)
-            cut_point = max_length - 3  # Leave room for "..."
-            
-            # Try to cut at a path separator
-            for i in range(cut_point, max(0, cut_point - 10), -1):
-                if display_path[i] in ['/', '\\']:
-                    cut_point = i
-                    break
-            
-            display_path = display_path[:cut_point] + "..."
-        
-        return display_path
         
     def clear_multi_plot(self):
         """Clear the multi-file plot"""

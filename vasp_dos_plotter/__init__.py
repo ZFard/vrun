@@ -19,6 +19,8 @@ __email__ = "zfard@iastate.edu"
 __license__ = "MIT"
 
 from .gui import DOSPlotterGUI
-from .plotter import plot_dos_file
+from .plotter import (plot_dos_file, plot_single_dos, plot_multi_dos, 
+                     create_export_plot, generate_colors, format_legend_label)
 
-__all__ = ["DOSPlotterGUI", "plot_dos_file", "__version__"]
+__all__ = ["DOSPlotterGUI", "plot_dos_file", "plot_single_dos", "plot_multi_dos", 
+           "create_export_plot", "generate_colors", "format_legend_label", "__version__"]
